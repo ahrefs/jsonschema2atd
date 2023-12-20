@@ -6,7 +6,7 @@ build:
 	$(DUNE) build
 
 install:
-	opam install .
+	opam install . --deps-only
 
 test:
 	$(DUNE) build @runtest
