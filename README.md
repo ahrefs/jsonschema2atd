@@ -1,6 +1,6 @@
 # jsonschema2atd
 
-Generates [atdgen](https://github.com/ahrefs/atd) types based on the OpenAPI scheme
+Generates [ATD](https://github.com/ahrefs/atd) types based on the JSON Scheme / OpenAPI document
 
 ## Setup and build
 
