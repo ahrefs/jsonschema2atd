@@ -1,0 +1,5 @@
+(library
+ (name jsonschema2atd_runtime)
+ (public_name jsonschema2atd.runtime)
+ (libraries yojson)
+ (wrapped true))

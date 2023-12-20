@@ -1,0 +1,32 @@
+opam-version: "2.0"
+version: "git"
+maintainer: "Ahrefs"
+authors: "Ahrefs"
+homepage: "https://github.com/ahrefs/jsonschema2atd"
+bug-reports: "https://github.com/ahrefs/jsonschema2atd/issues"
+dev-repo: "git+ssh://git@github.com/ahrefs/jsonschema2atd"
+synopsis: "Generate ATD types out of JSON Schema and OpenAPI document"
+depends: [
+  "atdgen"
+  "atdgen-runtime"
+  "cmdliner" {>= "1.1.0"}
+  "dune"
+  "ocaml"
+  "ounit2"
+  "odoc" {with-doc}
+  "yojson"
+]
+build: [
+  ["dune" "subst"] {dev}
+  [
+    "dune"
+    "build"
+    "-p"
+    name
+    "-j"
+    jobs
+    "@install"
+    "@runtest" {with-test}
+    "@doc" {with-doc}
+  ]
+]

@@ -1,0 +1,32 @@
+type contact = {
+  ~name : string nullable;
+  ~url : string nullable;
+  ~email : string nullable;
+}
+
+type license = {
+  name : string;
+  ~url : string nullable;
+}
+
+type info = {
+  title : string;
+  ~description : string nullable;
+  ~terms_of_service <json name="termsofservice"> : string nullable;
+  ~contact : contact nullable;
+  ~license : license nullable;
+  version : string;
+}
+
+type root = {
+  openapi : string;
+  ~components : components nullable;
+}
+
+type schema <ocaml module="Json_schema_j" t="schema "> = abstract
+
+type 'a or_ref <ocaml module="Json_schema_j" t="or_ref"> = abstract
+
+type components = {
+  ~schemas : (string * schema or_ref) list <json repr="object"> nullable;
+}

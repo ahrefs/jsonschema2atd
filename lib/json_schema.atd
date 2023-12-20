@@ -1,0 +1,100 @@
+type json <ocaml module="Yojson.Safe" t="t"> = abstract
+
+type 'a or_ref = [
+  | Obj of 'a
+  | Ref of ref_
+] <ocaml repr="classic"> <json adapter.ocaml="Json_schema_adapters.Or_ref">
+
+type typ = [
+  | Integer <json name="integer">
+  | Number <json name="number">
+  | String <json name="string">
+  | Boolean <json name="boolean">
+  | Object <json name="object">
+  | Array <json name="array">
+] <ocaml repr="classic">
+
+type int_format = [
+  | Int32 <json name="int32">
+  | Int64 <json name="int64">
+]
+
+type number_format = [
+  | Float <json name="float">
+  | Double <json name="double">
+]
+
+type str_format = [
+  | Date <json name="date">
+  | Datetime <json name="date-time">
+]
+
+type format = [
+  | inherit int_format
+  | inherit number_format
+  | inherit str_format
+]
+
+type schema = {
+  (* fields from Json Schema Core https://json-schema.org/draft/2020-12/json-schema-core.html *)
+  ~schema <json name="$schema">: string nullable;
+
+  (* 10.2.1 keywords for applying subschemas with logic *)
+  ~all_of <json name="allOf">: schema nonempty_list nullable;
+  ~any_of <json name="anyOf">: schema nonempty_list nullable;
+  ~one_of <json name="oneOf">: schema or_ref nonempty_list nullable;
+  ~not : schema nullable;
+
+  (* 10.3.1 keywords for applying subschemas to arrays *)
+  ~items : schema or_ref nullable;
+
+  (* 10.3.2 keywords for applying subschemas to objects *)
+  ~properties : (string * schema or_ref) list <json repr="object"> nullable;
+  ~additional_properties <json name="additionalProperties">: schema nullable;
+
+  (* fields from Json Schema Validation https://json-schema.org/draft/2020-12/json-schema-validation.html *)
+
+  (* 6.1 validation for any instance type *)
+  ~typ <json name="type">: typ nullable;
+  ~enum : string nonempty_list nullable;
+
+  (* 6.2 validation for numeric instances *)
+  (* ~multiple_of <json name="multipleOf">: float nullable; *)
+  (* ~maximum : float nullable; *)
+  (* ~exclusive_maximum <json name="exclusiveMaximum">: float nullable; *)
+  (* ~minimum : float nullable; *)
+  (* ~exclusive_minimum <json name="exclusiveMinimum">: float nullable; *)
+
+  (* 6.3 validation keywords for strings *)
+  ~max_length <json name="maxLength">: int nullable;
+  ~min_length <json name="minLength">: int nullable;
+  ~pattern : string nullable;
+
+  (* 6.4 validation keywords for arrays *)
+  ~max_items <json name="maxItems">: int nullable;
+  ~min_items <json name="minItems">: int nullable;
+  ~unique_items <json name="uniqueItems">: bool nullable;
+  ~max_contains <json name="maxContains">: int nullable;
+  ~min_contains <json name="minContains">: int nullable;
+
+  (* 6.5 validation keywords for objects *)
+  ~max_properties <json name="maxProperties">: int nullable;
+  ~min_properties <json name="minProperties">: int nullable;
+  ~required <ocaml default="[]">: string list;
+  ~dependent_required <ocaml default="[]"> <json name="dependentRequired">: (string * string list) list <json repr="object">;
+
+  (* 7. semantic content with "format" *)
+  ~format : format nullable;
+
+  (* 9. basic metadata annotations *)
+  ~title : string nullable;
+  ~description : string nullable;
+  ~default : json nullable;
+
+  (* other OpenAPI-specific fields not from JSON Schema subset *)
+  ~nullable <ocaml default="false">: bool;
+}
+
+type 'a nonempty_list = 'a list <ocaml valid="fun l -> List.length > 0">
+
+type ref_ = string wrap <ocaml t="string" wrap="fun a -> a" unwrap="fun a -> a">

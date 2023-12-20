@@ -1,0 +1,24 @@
+(library
+ (name jsonschema2atd)
+ (libraries atdgen-runtime str yojson)
+ (wrapped false))
+
+(rule
+ (targets openapi_t.mli openapi_t.ml openapi_j.mli openapi_j.ml)
+ (deps openapi.atd)
+ (action
+  (progn
+   (run %{bin:atdgen} -j -j-std -j-defaults %{deps})
+   (run %{bin:atdgen} -t %{deps}))))
+
+(rule
+ (targets
+  json_schema_t.mli
+  json_schema_t.ml
+  json_schema_j.mli
+  json_schema_j.ml)
+ (deps json_schema.atd)
+ (action
+  (progn
+   (run %{bin:atdgen} -j -j-std -j-defaults %{deps})
+   (run %{bin:atdgen} -t %{deps}))))
