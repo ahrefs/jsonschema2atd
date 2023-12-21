@@ -17,7 +17,7 @@ let process_int_type schema =
 let get_ref (ref : ref_) =
   match String.split_on_char '/' ref with
   | [ "#"; "components"; "schemas"; type_name ] -> type_name
-  | _ -> failwith "only same file components refs is supported"
+  | _ -> failwith "only same file components refs are supported"
 
 let rec ocaml_value_of_json = function
   | (`Bool _ | `Float _ | `Int _ | `Null) as json -> Yojson.Basic.to_string json
@@ -62,19 +62,19 @@ and process_array_type ~ancestors schema =
   | Some schema_or_ref -> [ make_type_from_schema_or_ref ~ancestors schema_or_ref; "list" ]
   | None -> failwith "items is not specified for array"
 
-and toplevel_defenitions = Buffer.create 16
+and toplevel_definitions = Buffer.create 16
 
 and process_nested_schema_type ~ancestors schema =
   match schema with
   | { one_of = Some _; _ } | { typ = Some Object; properties = Some _; _ } | { enum = Some _; _ } ->
     let nested_type_name = concat_camelCase (List.rev ancestors) in
     let nested = define_top_level nested_type_name (process_schema_type ~ancestors schema) in
-    Buffer.add_string toplevel_defenitions nested;
+    Buffer.add_string toplevel_definitions nested;
     type_name nested_type_name
   | _ as schema -> process_schema_type ~ancestors schema
 
 and process_object_type ~ancestors schema =
-  let is_required field_name = List.exists (fun field -> String.equal field_name field) schema.required in
+  let is_required field_name = List.exists (String.equal field_name) schema.required in
   let make_record_field (field_name, schema_or_ref) =
     let type_ = make_type_from_schema_or_ref ~ancestors:(field_name :: ancestors) schema_or_ref in
     let record_field_name = record_field_name field_name in
@@ -124,7 +124,7 @@ let process_schemas (schemas : (string * schema or_ref) list) =
       )
       [] schemas
   in
-  String.concat "" (Buffer.contents toplevel_defenitions :: atd_schemas)
+  String.concat "" (Buffer.contents toplevel_definitions :: atd_schemas)
 
 let prelude = {|
 type json <ocaml module="Yojson.Basic" t="t"> = abstract
