@@ -8,3 +8,5 @@ module Or_ref = struct
     | `List [ `String "Obj"; obj ] -> obj
     | x -> x
 end
+
+module Ref = Utils.Fresh (String) ()

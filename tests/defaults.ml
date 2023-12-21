@@ -38,5 +38,4 @@ let simple_test _ =
   assert_schema input output
 
 let suite = "Object with defaults" >::: [ "simple test" >:: simple_test ]
-
 let () = run_test_tt_main suite

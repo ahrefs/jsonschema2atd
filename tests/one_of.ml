@@ -73,5 +73,4 @@ let nested_one_of_test _ =
   assert_schema input output
 
 let suite = "oneOf" >::: [ "simple" >:: simple_test; "nested one of test" >:: nested_one_of_test ]
-
 let () = run_test_tt_main suite

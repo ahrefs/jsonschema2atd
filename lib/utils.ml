@@ -66,9 +66,26 @@ let sanitize_name str =
   if is_keyword str' then str' ^ "_" else str'
 
 let concat_camelCase strs = strs |> List.map String.capitalize_ascii |> String.concat ""
-
 let concat_snake_case strs = String.concat "_" strs
-
 let type_name = sanitize_name
-
 let variant_name str = String.capitalize_ascii (sanitize_name str)
+
+module Fresh
+    (T : sig
+       type t
+
+       val compare : t -> t -> int
+     end)
+    () =
+struct
+  external id : 'a -> 'a = "%identity"
+
+  type t = T.t
+
+  let inject = id
+  let project = id
+  let inject_list = id
+  let project_list = id
+  let compare = T.compare
+  let equal a b = T.compare a b = 0
+end

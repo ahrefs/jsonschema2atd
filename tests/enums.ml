@@ -61,5 +61,4 @@ let nested_enum _ =
   assert_schema input output
 
 let suite = "Nullable" >::: [ "top level enum" >:: top_level_enum; "nested enum" >:: nested_enum ]
-
 let () = run_test_tt_main suite

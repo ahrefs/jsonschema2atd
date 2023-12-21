@@ -76,5 +76,4 @@ let capitalized_refs_test _ =
   assert_schema input output
 
 let suite = "Refs" >::: [ "simple ref" >:: simple_ref_test; "capitalized ref" >:: capitalized_refs_test ]
-
 let () = run_test_tt_main suite

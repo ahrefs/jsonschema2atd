@@ -7,5 +7,4 @@ let nullable_integer_test _ =
   assert_schema input output
 
 let suite = "Nullable" >::: [ "nullable integer test" >:: nullable_integer_test ]
-
 let () = run_test_tt_main suite

@@ -43,5 +43,4 @@ let simple_test _ =
   assert_schema input output
 
 let suite = "allOf" >::: [ "simple test" >:: simple_test ]
-
 let () = run_test_tt_main suite

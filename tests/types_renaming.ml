@@ -7,5 +7,4 @@ let dot_in_the_file_names _ =
   assert_schema input output
 
 let suite = "Types renaming" >::: [ "dot_in_the_file_names" >:: dot_in_the_file_names ]
-
 let () = run_test_tt_main suite

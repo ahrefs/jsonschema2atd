@@ -6,9 +6,7 @@ let openapi_json_template schemas =
     schemas
 
 let replace_whitespace str = Str.global_replace (Str.regexp "[ \t\n\r]+") "" str
-
 let remove_prelude str = Str.global_replace (Str.regexp Converter.prelude) "" str
-
 let test_strings_cmp a b = String.equal (replace_whitespace a) (replace_whitespace b)
 
 let assert_schema input output =

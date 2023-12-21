@@ -12,7 +12,7 @@ let convert path_in =
 
 let convert_cmd =
   let doc = "Convert OpenAPI schema to atdgen types" in
-  let path_in = Arg.(required & pos 0 (some string) None & info [] ~docv:"OpenAPI .json file path" ~doc) in
+  let path_in = Arg.(required & pos 0 (some file) None & info [] ~docv:"OpenAPI .json file path" ~doc) in
   let term = Term.(const convert $ path_in) in
   let info = Cmd.info "convert" ~doc in
   Cmd.v info term

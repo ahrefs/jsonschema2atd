@@ -1,4 +1,4 @@
-type json <ocaml module="Yojson.Safe" t="t"> = abstract
+type json <ocaml module="Yojson.Basic" t="t"> = abstract
 
 type 'a or_ref = [
   | Obj of 'a
@@ -97,4 +97,4 @@ type schema = {
 
 type 'a nonempty_list = 'a list <ocaml valid="fun l -> List.length > 0">
 
-type ref_ = string wrap <ocaml t="string" wrap="fun a -> a" unwrap="fun a -> a">
+type ref_ = string wrap <ocaml t="Json_schema_adapters.Ref.t" wrap="Json_schema_adapters.Ref.inject" unwrap="Json_schema_adapters.Ref.project">

@@ -22,8 +22,6 @@ Run converter
 opam exec -- dune exec -- ./jsonschema2atd.exe ~/path-to-openapi-scheme
 ```
 
-See all available targets with `make help`.
-
 ## OpenAPI scheme features support
 
 - [X] Base types

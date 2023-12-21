@@ -15,25 +15,23 @@ let process_int_type schema =
   | _ -> failwith "int has unextected format"
 
 let get_ref (ref : ref_) =
-  let slash = Str.regexp "/" in
-  match Str.split slash ref with
+  match String.split_on_char '/' ref with
   | [ "#"; "components"; "schemas"; type_name ] -> type_name
   | _ -> failwith "only same file components refs is supported"
 
 let rec ocaml_value_of_json = function
-  | (`Bool _ | `Float _ | `Int _ | `Intlit _ | `Null) as json -> Yojson.Safe.to_string json
+  | (`Bool _ | `Float _ | `Int _ | `Null) as json -> Yojson.Basic.to_string json
   | `String value -> sprintf "\\\"%s\\\"" value
   | `List elements ->
     let list_elements = List.map ocaml_value_of_json elements |> String.concat ";" in
     sprintf "[%s]" list_elements
-  | (`Assoc _ | `Tuple _ | `Variant _) as json ->
-    failwith (sprintf "can't make ocaml value from: %s" (Yojson.Safe.to_string json))
+  | `Assoc _ as json -> failwith (sprintf "can't make ocaml value from: %s" (Yojson.Basic.to_string json))
 
 let make_atd_default_value enum json_value =
   match enum, json_value with
   | Some _, `String default_enum -> sprintf "`%s" (variant_name default_enum)
   | Some _, json ->
-    failwith (sprintf "only string enum default values are supported, can't process: %s" (Yojson.Safe.to_string json))
+    failwith (sprintf "only string enum default values are supported, can't process: %s" (Yojson.Basic.to_string json))
   | None, json -> ocaml_value_of_json json
 
 let nullable = Printf.sprintf "%s nullable"
@@ -98,12 +96,12 @@ and make_type_from_schema_or_ref ~ancestors (schema_or_ref : schema or_ref) =
 
 and process_one_of ~ancestors (schemas_or_refs : schema or_ref list) =
   let determine_variant_name = function
-    | Obj schema ->
-      (match schema.typ with
-      | Some Array -> concat_camelCase (process_array_type ~ancestors schema)
-      | Some Object -> "Json"
-      | _ -> variant_name (process_schema_type ~ancestors schema))
     | Ref ref_ -> variant_name (get_ref ref_)
+    | Obj schema ->
+    match schema.typ with
+    | Some Array -> concat_camelCase (process_array_type ~ancestors schema)
+    | Some Object -> "Json"
+    | _ -> variant_name (process_schema_type ~ancestors schema)
   in
   let make_one_of_variant schema_or_ref =
     let variant_name = determine_variant_name schema_or_ref in
@@ -111,7 +109,7 @@ and process_one_of ~ancestors (schemas_or_refs : schema or_ref list) =
       (make_type_from_schema_or_ref ~ancestors:(variant_name :: ancestors) schema_or_ref)
   in
   let variants = List.map make_one_of_variant schemas_or_refs |> String.concat "\n" in
-  sprintf "[\n%s\n] <json adapter.ocaml=\"Openapi2atd_lib.Adapter.One_of\">" variants
+  sprintf "[\n%s\n] <json adapter.ocaml=\"Openapi2atd_runtime.Adapter.One_of\">" variants
 
 and process_enums enums =
   let make_enum_variant value = sprintf {|  | %s <json name="%s">|} (variant_name value) value in
@@ -122,13 +120,14 @@ let process_schemas (schemas : (string * schema or_ref) list) =
   let atd_schemas =
     List.fold_left
       (fun acc (name, schema_or_ref) ->
-        define_top_level name (make_type_from_schema_or_ref ~ancestors:[ name ] schema_or_ref) :: acc)
+        define_top_level name (make_type_from_schema_or_ref ~ancestors:[ name ] schema_or_ref) :: acc
+      )
       [] schemas
   in
   String.concat "" (Buffer.contents toplevel_defenitions :: atd_schemas)
 
 let prelude = {|
-type json <ocaml module="Yojson.Safe" t="t"> = abstract
+type json <ocaml module="Yojson.Basic" t="t"> = abstract
 
 type int64 = int <ocaml repr="int64">
 |}
@@ -140,8 +139,8 @@ let make_atd_of_json_scheme input =
 let make_atd_of_openapi input =
   let root = Openapi_j.root_of_string input in
   match root.components with
-  | Some components ->
-    (match components.schemas with
-    | Some schemas -> prelude ^ "\n" ^ process_schemas schemas
-    | None -> failwith "components schemas are empty")
   | None -> failwith "components are empty"
+  | Some components ->
+  match components.schemas with
+  | Some schemas -> prelude ^ "\n" ^ process_schemas schemas
+  | None -> failwith "components schemas are empty"
