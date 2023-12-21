@@ -12,8 +12,10 @@ depends: [
   "cmdliner" {>= "1.1.0"}
   "dune"
   "ocaml"
-  "ounit2"
+  "ocaml-lsp-server" {with-dev-setup}
+  "ocamlformat" {with-dev-setup & >= "0.24" & < "0.25"}
   "odoc" {with-doc}
+  "ounit2" {with-test}
   "yojson"
 ]
 build: [
