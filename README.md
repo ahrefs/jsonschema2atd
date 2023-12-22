@@ -21,7 +21,7 @@ Generate ATD file out of OpenAPI document
 jsonschema2atd --format openapi ../path-to-openapi.json
 ```
 
-You can call `jsonschema2atd` and `atdgen` in your `dune` file to generate OCaml types and JSON serializers / desirializers from your JSON Scheme or OpenAPI document with `atdgen`:
+You can call `jsonschema2atd` and `atdgen` in your `dune` file to generate OCaml types and JSON serializers / desirializers from your JSON Scheme or OpenAPI document:
 ```
 ; add jsonschema2atd.runtime to have access the oneOf serialization adapter (for variants unboxing)
 (library
