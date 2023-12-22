@@ -1,12 +1,4 @@
 (tests
- (names
-  base
-  defaults
-  enums
-  nullable
-  objects
-  one_of
-  primitives
-  refs
-  types_renaming)
+ (names base defaults enums nullable objects one_of primitives refs
+   types_renaming)
  (libraries jsonschema2atd ounit2))
