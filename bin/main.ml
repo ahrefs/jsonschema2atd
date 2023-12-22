@@ -35,7 +35,7 @@ let main =
   let doc = "Generate ATD types from a JSON Schema / OpenAPI document" in
   let path_in = Arg.(required & pos 0 (some file) None & info [] ~docv:"input file" ~doc) in
   let term = Term.(const generate_atd $ input_format_term $ path_in) in
-  let info = Cmd.info "jsonschema2atd" ~doc in
+  let info = Cmd.info "jsonschema2atd" ~doc ~version:(Version.get ()) in
   Cmd.v info term
 
 let () = exit (Cmd.eval main)

@@ -2,4 +2,4 @@
  (name main)
  (public_name jsonschema2atd)
  (package jsonschema2atd)
- (libraries jsonschema2atd cmdliner))
+ (libraries jsonschema2atd dune-build-info cmdliner))
