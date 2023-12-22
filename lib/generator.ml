@@ -109,7 +109,7 @@ and process_one_of ~ancestors (schemas_or_refs : schema or_ref list) =
       (make_type_from_schema_or_ref ~ancestors:(variant_name :: ancestors) schema_or_ref)
   in
   let variants = List.map make_one_of_variant schemas_or_refs |> String.concat "\n" in
-  sprintf "[\n%s\n] <json adapter.ocaml=\"Openapi2atd_runtime.Adapter.One_of\">" variants
+  sprintf "[\n%s\n] <json adapter.ocaml=\"Jsonschema2atd_runtime.Adapter.One_of\">" variants
 
 and process_enums enums =
   let make_enum_variant value = sprintf {|  | %s <json name="%s">|} (variant_name value) value in
