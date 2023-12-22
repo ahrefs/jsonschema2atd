@@ -21,7 +21,7 @@ Generate ATD file out of OpenAPI document
 jsonschema2atd --format openapi ../path-to-openapi.json
 ```
 
-## OpenAPI schema features support
+## ToDo
 
 - [X] Base types
 - [X] Records
