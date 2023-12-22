@@ -12,18 +12,17 @@ module Input_format = struct
   let all = [ JSONSchema; OpenAPI ]
 end
 
-let convert format path_in =
+let generate_atd input_format path_in =
   let ic = open_in path_in in
-  let content = really_input_string ic (in_channel_length ic) in
+  let input_content = really_input_string ic (in_channel_length ic) in
   close_in ic;
 
-  let atd =
-    match format with
-    | Input_format.JSONSchema -> Converter.make_atd_of_jsonschema content
-    | OpenAPI -> Converter.make_atd_of_openapi content
+  let generate =
+    match input_format with
+    | Input_format.JSONSchema -> Generator.make_atd_of_jsonschema
+    | OpenAPI -> Generator.make_atd_of_openapi
   in
-
-  print_string atd;
+  input_content |> generate |> print_string;
   ()
 
 let input_format_term =
@@ -32,11 +31,11 @@ let input_format_term =
   let format = Arg.(enum formats) in
   Arg.(value & opt format JSONSchema & info [ "format"; "f" ] ~docv:"FORMAT" ~doc)
 
-let convert_cmd =
-  let doc = "Generate ATD types from a JSON schema / OpenAPI document" in
+let main =
+  let doc = "Generate ATD types from a JSON Schema / OpenAPI document" in
   let path_in = Arg.(required & pos 0 (some file) None & info [] ~docv:"input file" ~doc) in
-  let term = Term.(const convert $ input_format_term $ path_in) in
+  let term = Term.(const generate_atd $ input_format_term $ path_in) in
   let info = Cmd.info "jsonschema2atd" ~doc in
   Cmd.v info term
 
-let () = exit (Cmd.eval convert_cmd)
+let () = exit (Cmd.eval main)
