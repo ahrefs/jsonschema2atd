@@ -1,0 +1,16 @@
+{
+  "openapi": "3.0.0",
+  "components": {
+    "schemas": {
+      "product": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "description": "The unique identifier for a product",
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

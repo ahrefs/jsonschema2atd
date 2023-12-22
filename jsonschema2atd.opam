@@ -11,7 +11,7 @@ depends: [
   "atdgen" {with-test}
   "atdgen-runtime" {with-test}
   "cmdliner" {>= "1.1.0"}
-  "dune" {build}
+  "dune" {>= "3.0" & build}
   "ocaml-lsp-server" {with-dev-setup}
   "ocamlformat" {with-dev-setup & >= "0.24" & < "0.25"}
   "odoc" {with-doc}
@@ -19,7 +19,7 @@ depends: [
   "yojson" {with-test}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"

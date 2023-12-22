@@ -17,7 +17,7 @@ let process_int_type schema =
 let get_ref (ref : ref_) =
   match String.split_on_char '/' ref with
   | [ "#"; "components"; "schemas"; type_name ] -> type_name
-  | _ -> failwith "only same file components refs are supported"
+  | _ -> failwith "only OpenAPI refs is supported (#/components/schemas/)"
 
 let rec ocaml_value_of_json = function
   | (`Bool _ | `Float _ | `Int _ | `Null) as json -> Yojson.Basic.to_string json
@@ -126,15 +126,15 @@ let process_schemas (schemas : (string * schema or_ref) list) =
   in
   String.concat "" (Buffer.contents toplevel_definitions :: atd_schemas)
 
-let prelude = {|
+let base = {|
 type json <ocaml module="Yojson.Basic" t="t"> = abstract
-
 type int64 = int <ocaml repr="int64">
 |}
 
-let make_atd_of_json_scheme input =
+let make_atd_of_jsonschema input =
   let schema = Json_schema_j.schema_of_string input in
-  prelude ^ "\n" ^ process_schema_type ~ancestors:[] schema
+  let root_type_name = Option.value ~default:"root" schema.title in
+  base ^ "\n" ^ process_schemas [ root_type_name, Obj schema ]
 
 let make_atd_of_openapi input =
   let root = Openapi_j.root_of_string input in
@@ -142,5 +142,5 @@ let make_atd_of_openapi input =
   | None -> failwith "components are empty"
   | Some components ->
   match components.schemas with
-  | Some schemas -> prelude ^ "\n" ^ process_schemas schemas
+  | Some schemas -> base ^ "\n" ^ process_schemas schemas
   | None -> failwith "components schemas are empty"

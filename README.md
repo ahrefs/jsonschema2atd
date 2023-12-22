@@ -1,37 +1,36 @@
 # jsonschema2atd
 
-Generates [ATD](https://github.com/ahrefs/atd) types based on the JSON Scheme / OpenAPI document
+Generates [ATD](https://github.com/ahrefs/atd) types based on the JSON Schema / OpenAPI document.
 
-## Setup and build
+## Installation
 
-Install opam dependencies
-
+Install the package and dependencies with:
 ```bash
 make install
 ```
 
-Build the project
+## Usage
 
+Generate ATD file out of JSON Schema
 ```bash
-make
+jsonschema2atd ../path-to-jsonschema.json
 ```
 
-Run converter
-
+Generate ATD file out of OpenAPI document
 ```bash
-opam exec -- dune exec -- ./jsonschema2atd.exe ~/path-to-openapi-scheme
+jsonschema2atd --format openapi ../path-to-openapi.json
 ```
 
-## OpenAPI scheme features support
+## OpenAPI schema features support
 
 - [X] Base types
 - [X] Records
 - [X] Nullable
 - [X] String enums
 - [ ] Integer enums
-- [ ] Other base type enums
-- [X] Refs
-- [X] OneOf
+- [ ] Other primitive enums
+- [X] Refs (OpenAPI format)
+- [X] OneOf (stringification only)
 - [ ] not
 - [ ] anyOf
 - [ ] allOf

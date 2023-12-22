@@ -3,19 +3,16 @@
 DUNE=opam exec -- dune
 
 build:
-	$(DUNE) build
+	$(DUNE) build @all
 
 install:
-	opam install . --deps-only
+	opam install .
 
 test:
 	$(DUNE) build @runtest
 
 clean:
 	$(DUNE) clean
-
-run:
-	$(DUNE) exec -- ./jsonschema2atd.bc ${ARGS}
 
 fmt:
 # When running fmt make commands, if a dune build process is ongoing, dune

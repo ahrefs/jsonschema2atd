@@ -1,4 +1,17 @@
 (tests
- (names base defaults enums nullable objects one_of primitives refs
-   types_renaming)
+ (names
+  base
+  defaults
+  enums
+  nullable
+  objects
+  one_of
+  primitives
+  refs
+  types_renaming)
  (libraries jsonschema2atd ounit2))
+
+(cram
+ (deps
+  %{bin:jsonschema2atd}
+  (source_tree ./mocks)))

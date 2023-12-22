@@ -1,6 +1,7 @@
-(lang dune 2.0)
-(name jsonschema2atd)
+(lang dune 3.0)
 (generate_opam_files true)
+
+(name jsonschema2atd)
 (source (github ahrefs/jsonschema2atd))
 (authors "Ahrefs")
 (maintainers "Egor Chemokhonenko <egor.chemohonenko@ahrefs.com>")
