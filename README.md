@@ -30,7 +30,7 @@ jsonschema2atd --format openapi ../path-to-openapi.json
 - [ ] Integer enums
 - [ ] Other primitive enums
 - [X] Refs (OpenAPI format)
-- [X] OneOf (stringification only)
+- [X] OneOf (Only serialization is supported)
 - [ ] not
 - [ ] anyOf
 - [ ] allOf
