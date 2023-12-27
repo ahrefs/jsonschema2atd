@@ -116,12 +116,12 @@ let two_objects_with_same_nested_object_field_names _ =
     type oneValue = [
       | String of string
       | Int of int
-    ] <json adapter.ocaml="Openapi2atd_runtime.Adapter.One_of">
+    ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
 
     type twoValue = [
       | String of string
       | Int of int
-    ] <json adapter.ocaml="Openapi2atd_runtime.Adapter.One_of">
+    ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
 
     type two = {
       value: twoValue;

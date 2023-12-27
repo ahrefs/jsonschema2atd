@@ -24,7 +24,7 @@ let simple_test _ =
   type dummy = [
     | String of string
     | StringList of string list
-  ] <json adapter.ocaml="Openapi2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
 |}
   in
   assert_schema input output
@@ -64,7 +64,7 @@ let nested_one_of_test _ =
     type variableModelQuery = [
       | String of string
       | Json of variableModelQueryJson
-    ] <json adapter.ocaml="Openapi2atd_runtime.Adapter.One_of">
+    ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
 
     type variableModel = {
       ?query: variableModelQuery option;
