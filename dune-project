@@ -18,7 +18,7 @@
   (dune :build)
   dune-build-info
   (ocaml-lsp-server :with-dev-setup)
-  (ocamlformat (and :with-dev-setup (>= 0.24) (< 0.25)))
+  (ocamlformat (and :with-dev-setup (= 0.24.1)))
   (odoc :with-doc)
   (ounit2 :with-test)
   yojson))
