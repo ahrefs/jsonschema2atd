@@ -70,13 +70,12 @@ let concat_snake_case strs = String.concat "_" strs
 let type_name = sanitize_name
 let variant_name str = String.capitalize_ascii (sanitize_name str)
 
-module Fresh
-    (T : sig
-       type t
+module Fresh (T : sig
+  type t
 
-       val compare : t -> t -> int
-     end)
-    () =
+  val compare : t -> t -> int
+end)
+() =
 struct
   external id : 'a -> 'a = "%identity"
 
