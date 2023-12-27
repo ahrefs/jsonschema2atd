@@ -9,15 +9,16 @@ homepage: "https://github.com/ahrefs/jsonschema2atd"
 bug-reports: "https://github.com/ahrefs/jsonschema2atd/issues"
 depends: [
   "ocaml" {>= "4.08"}
-  "atdgen" {with-test}
-  "atdgen-runtime" {with-test}
+  "atdgen"
+  "atdgen-runtime"
   "cmdliner" {>= "1.1.0"}
   "dune" {>= "3.0" & build}
+  "dune-build-info"
   "ocaml-lsp-server" {with-dev-setup}
   "ocamlformat" {with-dev-setup & >= "0.24" & < "0.25"}
   "odoc" {with-doc}
   "ounit2" {with-test}
-  "yojson" {with-test}
+  "yojson"
 ]
 build: [
   ["dune" "subst"] {dev}
