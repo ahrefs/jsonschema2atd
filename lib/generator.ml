@@ -15,9 +15,9 @@ let process_int_type schema =
   | _ -> failwith "int has unextected format"
 
 let get_ref (ref : ref_) =
-  match String.split_on_char '/' ref with
-  | [ "#"; "components"; "schemas"; type_name ] -> type_name
-  | _ -> failwith "only OpenAPI refs is supported (#/components/schemas/)"
+  match ref |> String.split_on_char '/' |> List.rev  with
+  | type_name :: _ -> type_name
+  | _ -> failwith (Printf.sprintf "%s: can't resolve ref type name" ref)
 
 let rec ocaml_value_of_json = function
   | (`Bool _ | `Float _ | `Int _ | `Null) as json -> Yojson.Basic.to_string json
