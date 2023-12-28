@@ -36,7 +36,32 @@ let make_atd_default_value enum json_value =
 
 let nullable = Printf.sprintf "%s nullable"
 
+let nonempty_list_opt = function
+  | [] -> None
+  | non_empty_list -> Some non_empty_list
+
+let rec merge_all_of schema =
+  match schema.all_of with
+  | None -> schema
+  | Some [] -> failwith "empty allOf is unexpected"
+  | Some schemas ->
+    let all_schemas =
+      schema
+      :: List.filter_map
+           (function
+             | Obj schema -> Some (merge_all_of schema)
+             | Ref _ -> None
+             )
+           schemas
+    in
+    {
+      schema with
+      properties = all_schemas |> List.filter_map (fun schema -> schema.properties) |> List.flatten |> nonempty_list_opt;
+      required = all_schemas |> List.map (fun schema -> schema.required) |> List.flatten;
+    }
+
 let rec process_schema_type ~ancestors (schema : schema) =
+  let schema = merge_all_of schema in
   let maybe_nullable type_ = if schema.nullable then nullable type_ else type_ in
   match schema.one_of with
   | Some schemas -> process_one_of ~ancestors schemas
@@ -134,6 +159,7 @@ type int64 = int <ocaml repr="int64">
 let make_atd_of_jsonschema input =
   let schema = Json_schema_j.schema_of_string input in
   let root_type_name = Option.value ~default:"root" schema.title in
+  Buffer.clear toplevel_definitions;
   base ^ "\n" ^ process_schemas [ root_type_name, Obj schema ]
 
 let make_atd_of_openapi input =
@@ -142,5 +168,7 @@ let make_atd_of_openapi input =
   | None -> failwith "components are empty"
   | Some components ->
   match components.schemas with
-  | Some schemas -> base ^ "\n" ^ process_schemas schemas
+  | Some schemas ->
+    Buffer.clear toplevel_definitions;
+    base ^ "\n" ^ process_schemas schemas
   | None -> failwith "components schemas are empty"

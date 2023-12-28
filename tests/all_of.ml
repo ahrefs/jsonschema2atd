@@ -5,32 +5,32 @@ let simple_test _ =
   let input =
     {| {
     "dummy": {
-      "type": "object",
-      "properties": {
-        "field": {
-          "id": "string"
-        }
-      },
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "field": {
-              "name": "string"
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string"
             }
-          }
         },
-        {
-          "type": "object",
-          "properties": {
-            "field": {
-              "surname": "string"
+        "allOf": [
+            {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "surname": {
+                        "type": "string"
+                    }
+                }
             }
-          }
-        }
-      ]
+        ]
     }
-}|}
+} |}
   in
   let output =
     {|
@@ -38,6 +38,7 @@ let simple_test _ =
       ?id: string option;
       ?name: string option;
       ?surname: string option;
+     }
   |}
   in
   assert_schema input output
