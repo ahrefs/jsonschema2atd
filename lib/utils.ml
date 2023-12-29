@@ -94,3 +94,7 @@ let hd_opt = function
   | first :: _ -> Some first
 
 let shortest_list lists = lists |> List.sort (fun a b -> compare (List.length a) (List.length b)) |> hd_opt
+
+let nonempty_list_opt = function
+  | [] -> None
+  | non_empty_list -> Some non_empty_list

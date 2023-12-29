@@ -60,10 +60,6 @@ let make_atd_default_value enum json_value =
 
 let nullable = Printf.sprintf "%s nullable"
 
-let nonempty_list_opt = function
-  | [] -> None
-  | non_empty_list -> Some non_empty_list
-
 let merge_all_of schema =
   match schema.all_of with
   | None -> schema
@@ -84,7 +80,7 @@ let merge_all_of schema =
       | first :: _ -> Some first
     in
     let merge_lists get_fn = schemas |> List.map get_fn |> List.flatten in
-    let merge_opt_lists get_fn = schemas |> List.filter_map get_fn |> List.flatten |> nonempty_list_opt in
+    let merge_opt_lists get_fn = schemas |> List.filter_map get_fn |> List.flatten |> Utils.nonempty_list_opt in
     {
       schema with
       schema = take_first_opt (fun schema -> schema.schema);
@@ -100,7 +96,7 @@ let merge_all_of schema =
         |> List.filter_map (fun schema -> schema.enum)
         |> Utils.shortest_list
         |> Option.value ~default:[]
-        |> nonempty_list_opt;
+        |> Utils.nonempty_list_opt;
       max_length = take_first_opt (fun schema -> schema.max_length);
       min_length = take_first_opt (fun schema -> schema.min_length);
       pattern = take_first_opt (fun schema -> schema.pattern);
