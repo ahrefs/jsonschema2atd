@@ -15,7 +15,7 @@ let process_int_type schema =
   | _ -> failwith "int has unextected format"
 
 let get_ref (ref : ref_) =
-  match ref |> String.split_on_char '/' |> List.rev  with
+  match ref |> String.split_on_char '/' |> List.rev with
   | type_name :: _ -> type_name
   | _ -> failwith (Printf.sprintf "%s: can't resolve ref type name" ref)
 
