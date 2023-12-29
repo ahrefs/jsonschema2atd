@@ -67,4 +67,4 @@ You can call `jsonschema2atd` and `atdgen` in your `dune` file to generate OCaml
 - [X] OneOf (Only serialization is supported)
 - [ ] not
 - [ ] anyOf
-- [ ] allOf
+- [X] allOf
