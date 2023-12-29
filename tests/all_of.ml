@@ -3,34 +3,34 @@ open Base
 
 let simple_test _ =
   let input =
-    {| {
+    {|{
     "dummy": {
-        "type": "object",
-        "properties": {
-            "id": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
                 "type": "string"
             }
+          }
         },
-        "allOf": [
-            {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    }
-                }
-            },
-            {
-                "type": "object",
-                "properties": {
-                    "surname": {
-                        "type": "string"
-                    }
-                }
+        {
+          "type": "object",
+          "properties": {
+            "surname": {
+                "type": "string"
             }
-        ]
+          }
+        }
+      ]
     }
-} |}
+}|}
   in
   let output =
     {|
@@ -45,7 +45,7 @@ let simple_test _ =
 
 let with_nested _ =
   let input =
-    {| {
+    {|{
       "MappingType": {
         "type": "string",
         "enum": [
@@ -77,7 +77,7 @@ let with_nested _ =
           }
         }
       }
-} |}
+}|}
   in
   let output =
     {|
