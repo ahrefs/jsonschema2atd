@@ -64,7 +64,7 @@ let nonempty_list_opt = function
   | [] -> None
   | non_empty_list -> Some non_empty_list
 
-let rec merge_all_of schema =
+let merge_all_of schema =
   match schema.all_of with
   | None -> schema
   | Some [] -> failwith "empty allOf is unexpected"
@@ -72,53 +72,52 @@ let rec merge_all_of schema =
     let ref_schemas =
       List.filter_map
         (function
-          | Obj schema -> Some (merge_all_of schema)
+          | Obj schema -> Some schema
           | Ref ref -> get_ref_schema ~schema ref
           )
         all_of
     in
     let schemas = schema :: ref_schemas in
-    let take_opt get_fn =
+    let take_first_opt get_fn =
       match schemas |> List.filter_map get_fn with
       | [] -> None
       | first :: _ -> Some first
-      (* | _other -> failwith (Printf.sprintf "%s overwrite allOf attributes are not allowed" (Json_schema_j.string_of_schema schema)) *)
     in
     let merge_lists get_fn = schemas |> List.map get_fn |> List.flatten in
     let merge_opt_lists get_fn = schemas |> List.filter_map get_fn |> List.flatten |> nonempty_list_opt in
     {
-      schema = take_opt (fun schema -> schema.schema);
+      schema with
+      schema = take_first_opt (fun schema -> schema.schema);
       all_of = merge_opt_lists (fun schema -> schema.all_of);
       any_of = merge_opt_lists (fun schema -> schema.any_of);
       one_of = merge_opt_lists (fun schema -> schema.one_of);
-      not = take_opt (fun schema -> schema.not);
-      items = take_opt (fun schema -> schema.items);
+      not = take_first_opt (fun schema -> schema.not);
+      items = take_first_opt (fun schema -> schema.items);
       properties = merge_opt_lists (fun schema -> schema.properties);
-      additional_properties = take_opt (fun schema -> schema.additional_properties);
-      typ = take_opt (fun schema -> schema.typ);
+      additional_properties = take_first_opt (fun schema -> schema.additional_properties);
       enum =
         schemas
         |> List.filter_map (fun schema -> schema.enum)
         |> Utils.shortest_list
         |> Option.value ~default:[]
         |> nonempty_list_opt;
-      max_length = take_opt (fun schema -> schema.max_length);
-      min_length = take_opt (fun schema -> schema.min_length);
-      pattern = take_opt (fun schema -> schema.pattern);
-      max_items = take_opt (fun schema -> schema.max_items);
-      min_items = take_opt (fun schema -> schema.min_items);
-      unique_items = take_opt (fun schema -> schema.unique_items);
-      max_contains = take_opt (fun schema -> schema.max_contains);
-      min_contains = take_opt (fun schema -> schema.min_contains);
-      max_properties = take_opt (fun schema -> schema.max_properties);
-      min_properties = take_opt (fun schema -> schema.min_properties);
+      max_length = take_first_opt (fun schema -> schema.max_length);
+      min_length = take_first_opt (fun schema -> schema.min_length);
+      pattern = take_first_opt (fun schema -> schema.pattern);
+      max_items = take_first_opt (fun schema -> schema.max_items);
+      min_items = take_first_opt (fun schema -> schema.min_items);
+      unique_items = take_first_opt (fun schema -> schema.unique_items);
+      max_contains = take_first_opt (fun schema -> schema.max_contains);
+      min_contains = take_first_opt (fun schema -> schema.min_contains);
+      max_properties = take_first_opt (fun schema -> schema.max_properties);
+      min_properties = take_first_opt (fun schema -> schema.min_properties);
       required = merge_lists (fun schema -> schema.required);
       dependent_required = merge_lists (fun schema -> schema.dependent_required);
-      format = take_opt (fun schema -> schema.format);
+      format = take_first_opt (fun schema -> schema.format);
       defs = merge_opt_lists (fun schema -> schema.defs);
-      title = take_opt (fun schema -> schema.title);
-      description = take_opt (fun schema -> schema.description);
-      default = take_opt (fun schema -> schema.default);
+      title = take_first_opt (fun schema -> schema.title);
+      description = take_first_opt (fun schema -> schema.description);
+      default = take_first_opt (fun schema -> schema.default);
       nullable = schemas |> List.exists (fun schema -> schema.nullable);
     }
 
@@ -138,8 +137,7 @@ let rec process_schema_type ~ancestors (schema : schema) =
   | Some String -> maybe_nullable "string"
   | Some Boolean -> maybe_nullable "bool"
   | Some Array -> maybe_nullable (process_array_type ~ancestors schema |> String.concat " ")
-  | Some Object ->
-    if schema.nullable then process_nested_schema_type ~ancestors schema else process_object_type ~ancestors schema
+  | Some Object -> process_object_type ~ancestors schema
   | None ->
     (* fallback to untyped if schema type is not defined *)
     maybe_nullable "json"
@@ -150,13 +148,13 @@ and process_array_type ~ancestors schema =
   | None -> failwith "items is not specified for array"
 
 and process_nested_schema_type ~ancestors schema =
-  match schema with
+  match merge_all_of schema with
   | { one_of = Some _; _ } | { typ = Some Object; properties = Some _; _ } | { enum = Some _; _ } ->
     let nested_type_name = concat_camelCase (List.rev ancestors) in
     let nested = define_top_level nested_type_name (process_schema_type ~ancestors schema) in
     Buffer.add_string toplevel_definitions nested;
     type_name nested_type_name
-  | _ as schema -> process_schema_type ~ancestors schema
+  | _ -> process_schema_type ~ancestors schema
 
 and process_object_type ~ancestors schema =
   let is_required field_name = List.exists (String.equal field_name) schema.required in
