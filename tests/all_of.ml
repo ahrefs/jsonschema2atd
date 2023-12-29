@@ -43,7 +43,6 @@ let simple_test _ =
   in
   assert_schema input output
 
-
 let with_nested _ =
   let input =
     {| {
@@ -100,8 +99,5 @@ let with_nested _ =
   in
   assert_schema input output
 
-let suite = "allOf" >::: [
-  "simple test" >:: simple_test;
-  "with nested" >:: with_nested
-  ]
+let suite = "allOf" >::: [ "simple test" >:: simple_test; "with nested" >:: with_nested ]
 let () = run_test_tt_main suite
