@@ -6,6 +6,7 @@
 (source (github ahrefs/jsonschema2atd))
 (authors "Ahrefs")
 (maintainers "Egor Chemokhonenko <egor.chemohonenko@ahrefs.com>")
+(license "MIT")
 (package
  (name jsonschema2atd)
  (synopsis "Generate ATD types out of JSON Schema and OpenAPI document")

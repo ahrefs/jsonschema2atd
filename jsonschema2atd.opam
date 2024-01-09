@@ -5,6 +5,7 @@ synopsis: "Generate ATD types out of JSON Schema and OpenAPI document"
 description: "Generate ATD types out of JSON Schema and OpenAPI document"
 maintainer: ["Egor Chemokhonenko <egor.chemohonenko@ahrefs.com>"]
 authors: ["Ahrefs"]
+license: "MIT"
 homepage: "https://github.com/ahrefs/jsonschema2atd"
 bug-reports: "https://github.com/ahrefs/jsonschema2atd/issues"
 depends: [
