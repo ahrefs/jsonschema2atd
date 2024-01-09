@@ -8,8 +8,8 @@ authors: ["Ahrefs"]
 homepage: "https://github.com/ahrefs/jsonschema2atd"
 bug-reports: "https://github.com/ahrefs/jsonschema2atd/issues"
 depends: [
-  "ocaml" {>= "4.08"}
-  "atdgen"
+  "ocaml" {>= "4.10"}
+  "atdgen" {>= "2.7"}
   "atdgen-runtime"
   "cmdliner" {>= "1.1.0"}
   "dune" {>= "3.0" & build}
