@@ -11,11 +11,9 @@
  (synopsis "Generate ATD types out of JSON Schema and OpenAPI document")
  (description "Generate ATD types out of JSON Schema and OpenAPI document")
  (depends
-  (ocaml (>= 4.08))
-  atdgen
-  atdgen-runtime
+  (ocaml (>= 4.10))
+  (atdgen (>= 2.7))
   (cmdliner (>= 1.1.0))
-  (dune :build)
   dune-build-info
   (ocaml-lsp-server :with-dev-setup)
   (ocamlformat (and :with-dev-setup (= 0.24.1)))
