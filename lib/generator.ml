@@ -26,21 +26,18 @@ let get_ref_name (ref : ref_) =
 
 let toplevel_definitions = Buffer.create 16
 let global_defs = ref []
-let schemas_to_obj = List.map (fun (name, schema) -> name, Obj schema)
 
-let rec get_ref_schema ~schema ref =
+let get_schema_by_ref ~schema ref =
   let defs =
     match schema.defs with
     | None -> !global_defs
-    | Some defs -> schemas_to_obj defs @ !global_defs
+    | Some defs -> defs @ !global_defs
   in
   List.find_map
-    (fun (name, schema_or_ref) ->
-      match schema_or_ref with
-      | Obj schema when String.equal (get_ref_name ref) name -> Some schema
-      | Obj _ -> None
-      | Ref ref -> get_ref_schema ~schema ref
-    )
+    (function
+      | name, schema when String.equal (get_ref_name ref) name -> Some schema
+      | _ -> None
+      )
     defs
 
 let rec ocaml_value_of_json = function
@@ -69,7 +66,7 @@ let merge_all_of schema =
       List.filter_map
         (function
           | Obj schema -> Some schema
-          | Ref ref -> get_ref_schema ~schema ref
+          | Ref ref -> get_schema_by_ref ~schema ref
           )
         all_of
     in
@@ -82,7 +79,6 @@ let merge_all_of schema =
     let merge_lists get_fn = schemas |> List.map get_fn |> List.flatten in
     let merge_opt_lists get_fn = schemas |> List.filter_map get_fn |> List.flatten |> Utils.nonempty_list_opt in
     {
-      schema with
       schema = take_first_opt (fun schema -> schema.schema);
       all_of = merge_opt_lists (fun schema -> schema.all_of);
       any_of = merge_opt_lists (fun schema -> schema.any_of);
@@ -112,6 +108,7 @@ let merge_all_of schema =
       format = take_first_opt (fun schema -> schema.format);
       defs = merge_opt_lists (fun schema -> schema.defs);
       title = take_first_opt (fun schema -> schema.title);
+      typ = take_first_opt (fun schema -> schema.typ);
       description = take_first_opt (fun schema -> schema.description);
       default = take_first_opt (fun schema -> schema.default);
       nullable = schemas |> List.exists (fun schema -> schema.nullable);
@@ -177,7 +174,7 @@ and process_one_of ~ancestors (schemas_or_refs : schema or_ref list) =
   let determine_variant_name = function
     | Ref ref_ -> variant_name (get_ref_name ref_)
     | Obj schema ->
-    match schema.typ with
+    match (merge_all_of schema).typ with
     | Some Array -> concat_camelCase (process_array_type ~ancestors schema)
     | Some Object -> "Json"
     | _ -> variant_name (process_schema_type ~ancestors schema)
@@ -214,7 +211,7 @@ let make_atd_of_jsonschema input =
   let schema = Json_schema_j.schema_of_string input in
   let root_type_name = Option.value ~default:"root" schema.title in
   Buffer.clear toplevel_definitions;
-  Option.iter (fun defs -> global_defs := schemas_to_obj defs) schema.defs;
+  Option.iter (fun defs -> global_defs := defs) schema.defs;
   base ^ "\n" ^ process_schemas [ root_type_name, Obj schema ]
 
 let make_atd_of_openapi input =
@@ -225,6 +222,12 @@ let make_atd_of_openapi input =
   match components.schemas with
   | Some schemas ->
     Buffer.clear toplevel_definitions;
-    global_defs := schemas;
+    global_defs :=
+      List.filter_map
+        (function
+          | _name, Ref _ -> None
+          | name, Obj schema -> Some (name, schema)
+          )
+        schemas;
     base ^ "\n" ^ process_schemas schemas
   | None -> failwith "components schemas are empty"

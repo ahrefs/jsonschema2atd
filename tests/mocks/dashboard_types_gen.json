@@ -1487,20 +1487,7 @@
                   "type": "object",
                   "oneOf": [
                     {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/Panel"
-                        },
-                        {
-                          "not": {
-                            "anyOf": [
-                              {
-                                "$ref": "#/components/schemas/RowPanel"
-                              }
-                            ]
-                          }
-                        }
-                      ]
+                      "$ref": "#/components/schemas/Panel"
                     },
                     {
                       "$ref": "#/components/schemas/RowPanel"

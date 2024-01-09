@@ -116,7 +116,7 @@ Generate ATD types from grok (Grafana Object Development Kit) dashboard types
   ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
   
   type dashboardSpecPanels = [
-    | Json of json
+    | Panel of panel
     | RowPanel of rowPanel
     | GraphPanel of graphPanel
     | HeatmapPanel of heatmapPanel
