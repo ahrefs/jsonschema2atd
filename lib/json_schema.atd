@@ -40,7 +40,7 @@ type schema = {
   ~schema <json name="$schema">: string nullable;
 
   (* 10.2.1 keywords for applying subschemas with logic *)
-  ~all_of <json name="allOf">: schema nonempty_list nullable;
+  ~all_of <json name="allOf">: schema or_ref nonempty_list nullable;
   ~any_of <json name="anyOf">: schema nonempty_list nullable;
   ~one_of <json name="oneOf">: schema or_ref nonempty_list nullable;
   ~not : schema nullable;
@@ -85,6 +85,9 @@ type schema = {
 
   (* 7. semantic content with "format" *)
   ~format : format nullable;
+
+  (* 8.2.4. re-usable JSON Schemas *)
+  ~defs <json name="$defs">: (string * schema) list <json repr="object"> nullable;
 
   (* 9. basic metadata annotations *)
   ~title : string nullable;

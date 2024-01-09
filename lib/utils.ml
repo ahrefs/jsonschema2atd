@@ -88,3 +88,13 @@ struct
   let compare = T.compare
   let equal a b = T.compare a b = 0
 end
+
+let hd_opt = function
+  | [] -> None
+  | first :: _ -> Some first
+
+let shortest_list lists = lists |> List.sort (fun a b -> compare (List.length a) (List.length b)) |> hd_opt
+
+let nonempty_list_opt = function
+  | [] -> None
+  | non_empty_list -> Some non_empty_list
