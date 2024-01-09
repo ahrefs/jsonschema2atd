@@ -14,6 +14,7 @@
  (depends
   (ocaml (>= 4.10))
   (atdgen (>= 2.7))
+  (atdgen-runtime (>= 2.0))
   (cmdliner (>= 1.1.0))
   dune-build-info
   (ocaml-lsp-server :with-dev-setup)
