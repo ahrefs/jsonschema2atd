@@ -6,7 +6,15 @@ let record_field_name str =
   let cleaned_field_name = Utils.sanitize_name str in
   if String.equal str cleaned_field_name then str else sprintf {|%s <json name="%s">|} cleaned_field_name str
 
-let define_type name type_ = sprintf "type %s = %s\n" (type_name name) type_
+let doc_annotation text = sprintf {|<doc text=%S>|} text
+
+let define_type ~doc ~name ~type_ =
+  let doc =
+    match doc with
+    | None -> ""
+    | Some doc -> doc_annotation doc
+  in
+  sprintf "type %s = %s %s\n" (type_name name) type_ doc
 
 let process_int_type schema =
   match schema.format with
@@ -147,7 +155,9 @@ and process_nested_schema_type ~ancestors schema =
   match merge_all_of schema with
   | { one_of = Some _; _ } | { typ = Some Object; properties = Some _; _ } | { enum = Some _; _ } ->
     let nested_type_name = concat_camelCase (List.rev ancestors) in
-    let nested = define_type nested_type_name (process_schema_type ~ancestors schema) in
+    let nested =
+      define_type ~name:nested_type_name ~type_:(process_schema_type ~ancestors schema) ~doc:schema.description
+    in
     Buffer.add_string output (nested ^ "\n");
     type_name nested_type_name
   | _ -> process_schema_type ~ancestors schema
@@ -157,11 +167,19 @@ and process_object_type ~ancestors schema =
   let make_record_field (field_name, schema_or_ref) =
     let type_ = make_type_from_schema_or_ref ~ancestors:(field_name :: ancestors) schema_or_ref in
     let record_field_name = record_field_name field_name in
+    let doc =
+      let content =
+        match schema_or_ref with
+        | Ref _ -> None
+        | Obj schema -> schema.description
+      in
+      Option.map doc_annotation content |> Option.value ~default:""
+    in
     match schema_or_ref, is_required field_name with
     | Obj { default = Some default; enum; _ }, _ ->
-      sprintf "  ~%s <ocaml default=\"%s\">: %s;" record_field_name (make_atd_default_value enum default) type_
-    | _, true -> sprintf "  %s: %s;" record_field_name type_
-    | _, false -> sprintf "  ?%s: %s option;" record_field_name type_
+      sprintf "  ~%s %s <ocaml default=\"%s\">: %s;" record_field_name doc (make_atd_default_value enum default) type_
+    | _, true -> sprintf "  %s %s: %s;" record_field_name doc type_
+    | _, false -> sprintf "  ?%s %s: %s option;" record_field_name doc type_
   in
   match schema.properties with
   | Some properties -> sprintf "{\n%s\n}" (properties |> List.map make_record_field |> String.concat "\n")
@@ -198,7 +216,12 @@ and process_enums enums =
 let process_schemas (schemas : (string * schema or_ref) list) =
   List.fold_left
     (fun acc (name, schema_or_ref) ->
-      define_type name (make_type_from_schema_or_ref ~ancestors:[ name ] schema_or_ref) :: acc
+      let doc =
+        match schema_or_ref with
+        | Ref _ -> None
+        | Obj schema -> schema.description
+      in
+      define_type ~doc ~name ~type_:(make_type_from_schema_or_ref ~ancestors:[ name ] schema_or_ref) :: acc
     )
     [] schemas
 

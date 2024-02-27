@@ -5,185 +5,185 @@ Generate ATD types from grok (Grafana Object Development Kit) dashboard types
   type int64 = int <ocaml repr="int64">
   
   type fieldConfigSourceOverrides = {
-    matcher: matcherConfig;
-    properties: dynamicConfigValue list;
-  }
+    matcher : matcherConfig;
+    properties : dynamicConfigValue list;
+  } 
   
   type graphPanelType = [
     | Graph <json name="graph">
-  ]
+  ] 
   
   type graphPanelLegend = {
-    ~show <ocaml default="true">: bool;
-    ?sort: string option;
-    ?sortDesc: bool option;
-  }
+    ~show  <ocaml default="true">: bool;
+    ?sort : string option;
+    ?sortDesc : bool option;
+  } <doc text="@deprecated this is part of deprecated graph panel">
   
   type heatmapPanelType = [
     | Heatmap <json name="heatmap">
-  ]
+  ] 
   
   type panelRepeatDirection = [
     | H <json name="h">
     | V <json name="v">
-  ]
+  ] <doc text="Direction to repeat in if 'repeat' is set.\n`h` for horizontal, `v` for vertical.">
   
   type rangeMapType = [
     | Range <json name="range">
-  ]
+  ] 
   
   type rangeMapOptions = {
-    from: float;
-    to_ <json name="to">: float;
-    result: valueMappingResult;
-  }
+    from <doc text="Min value of the range. It can be null which means -Infinity">: float;
+    to_ <json name="to"> <doc text="Max value of the range. It can be null which means +Infinity">: float;
+    result : valueMappingResult;
+  } <doc text="Range to match against and the result to apply when the value is within the range">
   
   type regexMapType = [
     | Regex <json name="regex">
-  ]
+  ] 
   
   type regexMapOptions = {
-    pattern: string;
-    result: valueMappingResult;
-  }
+    pattern <doc text="Regular expression to match against">: string;
+    result : valueMappingResult;
+  } <doc text="Regular expression to match against and the result to apply when the value matches the regex">
   
   type rowPanelType = [
     | Row <json name="row">
-  ]
+  ] <doc text="The panel type">
   
   type rowPanelPanels = [
     | Panel of panel
     | GraphPanel of graphPanel
     | HeatmapPanel of heatmapPanel
-  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of"> 
   
   type specialValueMapType = [
     | Special <json name="special">
-  ]
+  ] 
   
   type specialValueMapOptions = {
-    match_ <json name="match">: specialValueMatch;
-    result: valueMappingResult;
-  }
+    match_ <json name="match"> : specialValueMatch;
+    result : valueMappingResult;
+  } 
   
   type valueMapType = [
     | Value <json name="value">
-  ]
+  ] 
   
   type variableModelQuery = [
     | String of string
     | Json of json
-  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of"> <doc text="Query used to fetch values for a variable">
   
   type variableOptionText = [
     | String of string
     | StringList of string list
-  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of"> <doc text="Text to be displayed for the option">
   
   type variableOptionValue = [
     | String of string
     | StringList of string list
-  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of"> <doc text="Value of the option">
   
   type dashboardMetadata = {
-    updateTimestamp: string;
-    createdBy: string;
-    updatedBy: string;
-    extraFields: json;
-    uid: string;
-    creationTimestamp: string;
-    ?deletionTimestamp: string option;
-    finalizers: string list;
-    resourceVersion: string;
-    labels: json;
-  }
+    updateTimestamp : string;
+    createdBy : string;
+    updatedBy : string;
+    extraFields <doc text="extraFields is reserved for any fields that are pulled from the API server metadata but do not have concrete fields in the CUE metadata">: json;
+    uid : string;
+    creationTimestamp : string;
+    ?deletionTimestamp : string option;
+    finalizers : string list;
+    resourceVersion : string;
+    labels : json;
+  } <doc text="metadata contains embedded CommonMetadata and can be extended with custom string fields\nTODO: use CommonMetadata instead of redefining here; currently needs to be defined here\nwithout external reference as using the CommonMetadata reference breaks thema codegen.">
   
   type dashboardSpecTime = {
-    ~from <ocaml default="\"now-6h\"">: string;
-    ~to_ <json name="to"> <ocaml default="\"now\"">: string;
-  }
+    ~from  <ocaml default="\"now-6h\"">: string;
+    ~to_ <json name="to">  <ocaml default="\"now\"">: string;
+  } <doc text="Time range for dashboard.\nAccepted values are relative time strings like {from: 'now-6h', to: 'now'} or absolute time strings like {from: '2020-07-10T08:00:00.000Z', to: '2020-07-10T14:00:00.000Z'}.">
   
   type dashboardSpecTimepicker = {
-    ~hidden <ocaml default="false">: bool;
-    ~refresh_intervals <ocaml default="[\"5s\";\"10s\";\"30s\";\"1m\";\"5m\";\"15m\";\"30m\";\"1h\";\"2h\";\"1d\"]">: string list;
-    ~collapse <ocaml default="false">: bool;
-    ~time_options <ocaml default="[\"5m\";\"15m\";\"1h\";\"6h\";\"12h\";\"24h\";\"2d\";\"7d\";\"30d\"]">: string list;
-  }
+    ~hidden <doc text="Whether timepicker is visible or not."> <ocaml default="false">: bool;
+    ~refresh_intervals <doc text="Interval options available in the refresh picker dropdown."> <ocaml default="[\"5s\";\"10s\";\"30s\";\"1m\";\"5m\";\"15m\";\"30m\";\"1h\";\"2h\";\"1d\"]">: string list;
+    ~collapse <doc text="Whether timepicker is collapsed or not. Has no effect on provisioned dashboard."> <ocaml default="false">: bool;
+    ~time_options <doc text="Selectable options available in the time picker dropdown. Has no effect on provisioned dashboard."> <ocaml default="[\"5m\";\"15m\";\"1h\";\"6h\";\"12h\";\"24h\";\"2d\";\"7d\";\"30d\"]">: string list;
+  } <doc text="Configuration of the time picker shown at the top of a dashboard.">
   
   type dashboardSpecRefresh = [
     | Bool of bool
     | String of string
-  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of"> <doc text="Refresh rate of dashboard. Represented via interval string, e.g. \"5s\", \"1m\", \"1h\", \"1d\".">
   
   type dashboardSpecPanels = [
     | Panel of panel
     | RowPanel of rowPanel
     | GraphPanel of graphPanel
     | HeatmapPanel of heatmapPanel
-  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of"> 
   
   type dashboardSpecTemplating = {
-    ?list: variableModel list option;
-  }
+    ?list <doc text="List of configured template variables with their saved values along with some other metadata">: variableModel list option;
+  } <doc text="Configured template variables">
   
   type dashboardSpec = {
-    ?id: int option;
-    ?uid: string option;
-    ?title: string option;
-    ?description: string option;
-    ?revision: int64 option;
-    ?gnetId: string option;
-    ?tags: string list option;
-    ~timezone <ocaml default="\"browser\"">: string;
-    ~editable <ocaml default="true">: bool;
-    ?graphTooltip: dashboardCursorSync option;
-    ?time: dashboardSpecTime option;
-    ?timepicker: dashboardSpecTimepicker option;
-    ~fiscalYearStartMonth <ocaml default="0">: int;
-    ?liveNow: bool option;
-    ?weekStart: string option;
-    ?refresh: dashboardSpecRefresh option;
-    ~schemaVersion <ocaml default="36">: int;
-    ?version: int option;
-    ?panels: dashboardSpecPanels list option;
-    ?templating: dashboardSpecTemplating option;
-    ?annotations: annotationContainer option;
-    ?links: dashboardLink list option;
-    ?snapshot: snapshot option;
-  }
+    ?id <doc text="Unique numeric identifier for the dashboard.\n`id` is internal to a specific Grafana instance. `uid` should be used to identify a dashboard across Grafana instances.">: int option;
+    ?uid <doc text="Unique dashboard identifier that can be generated by anyone. string (8-40)">: string option;
+    ?title <doc text="Title of dashboard.">: string option;
+    ?description <doc text="Description of dashboard.">: string option;
+    ?revision <doc text="This property should only be used in dashboards defined by plugins.  It is a quick check\nto see if the version has changed since the last time.">: int64 option;
+    ?gnetId <doc text="ID of a dashboard imported from the https://grafana.com/grafana/dashboards/ portal">: string option;
+    ?tags <doc text="Tags associated with dashboard.">: string list option;
+    ~timezone <doc text="Timezone of dashboard. Accepted values are IANA TZDB zone ID or \"browser\" or \"utc\"."> <ocaml default="\"browser\"">: string;
+    ~editable <doc text="Whether a dashboard is editable or not."> <ocaml default="true">: bool;
+    ?graphTooltip : dashboardCursorSync option;
+    ?time <doc text="Time range for dashboard.\nAccepted values are relative time strings like {from: 'now-6h', to: 'now'} or absolute time strings like {from: '2020-07-10T08:00:00.000Z', to: '2020-07-10T14:00:00.000Z'}.">: dashboardSpecTime option;
+    ?timepicker <doc text="Configuration of the time picker shown at the top of a dashboard.">: dashboardSpecTimepicker option;
+    ~fiscalYearStartMonth <doc text="The month that the fiscal year starts on.  0 = January, 11 = December"> <ocaml default="0">: int;
+    ?liveNow <doc text="When set to true, the dashboard will redraw panels at an interval matching the pixel width.\nThis will keep data \"moving left\" regardless of the query refresh rate. This setting helps\navoid dashboards presenting stale live data">: bool option;
+    ?weekStart <doc text="Day when the week starts. Expressed by the name of the day in lowercase, e.g. \"monday\".">: string option;
+    ?refresh <doc text="Refresh rate of dashboard. Represented via interval string, e.g. \"5s\", \"1m\", \"1h\", \"1d\".">: dashboardSpecRefresh option;
+    ~schemaVersion <doc text="Version of the JSON schema, incremented each time a Grafana update brings\nchanges to said schema."> <ocaml default="36">: int;
+    ?version <doc text="Version of the dashboard, incremented each time the dashboard is updated.">: int option;
+    ?panels <doc text="List of dashboard panels">: dashboardSpecPanels list option;
+    ?templating <doc text="Configured template variables">: dashboardSpecTemplating option;
+    ?annotations : annotationContainer option;
+    ?links <doc text="Links with references to other dashboards or external websites.">: dashboardLink list option;
+    ?snapshot : snapshot option;
+  } 
   
   type dashboardStatus = {
-    ?operatorStates: json option;
-    ?additionalFields: json option;
-  }
+    ?operatorStates <doc text="operatorStates is a map of operator ID to operator state evaluations.\nAny operator which consumes this kind SHOULD add its state evaluation information to this field.">: json option;
+    ?additionalFields <doc text="additionalFields is reserved for future use">: json option;
+  } 
   
   type statusOperatorStateState = [
     | Success <json name="success">
     | In_progress <json name="in_progress">
     | Failed <json name="failed">
-  ]
+  ] <doc text="state describes the state of the lastEvaluation.\nIt is limited to three possible states for machine evaluation.">
   
   type statusOperatorState = {
-    lastEvaluation: string;
-    state: statusOperatorStateState;
-    ?descriptiveState: string option;
-    ?details: json option;
-  }
+    lastEvaluation <doc text="lastEvaluation is the ResourceVersion last evaluated">: string;
+    state <doc text="state describes the state of the lastEvaluation.\nIt is limited to three possible states for machine evaluation.">: statusOperatorStateState;
+    ?descriptiveState <doc text="descriptiveState is an optional more descriptive state field which has no requirements on format">: string option;
+    ?details <doc text="details contains any extra information that is operator-specific">: json option;
+  } 
   
   type dashboard = {
-    metadata: dashboardMetadata;
-    spec: dashboardSpec;
-    status: dashboardStatus;
-  }
+    metadata <doc text="metadata contains embedded CommonMetadata and can be extended with custom string fields\nTODO: use CommonMetadata instead of redefining here; currently needs to be defined here\nwithout external reference as using the CommonMetadata reference breaks thema codegen.">: dashboardMetadata;
+    spec : dashboardSpec;
+    status : dashboardStatus;
+  } 
   
   type _kubeObjectMetadata = {
-    uid: string;
-    creationTimestamp: string;
-    ?deletionTimestamp: string option;
-    finalizers: string list;
-    resourceVersion: string;
-    labels: json;
-  }
+    uid : string;
+    creationTimestamp : string;
+    ?deletionTimestamp : string option;
+    finalizers : string list;
+    resourceVersion : string;
+    labels : json;
+  } <doc text="_kubeObjectMetadata is metadata found in a kubernetes object's metadata field.\nIt is not exhaustive and only includes fields which may be relevant to a kind's implementation,\nAs it is also intended to be generic enough to function with any API Server.">
   
   type variableType = [
     | Query <json name="query">
@@ -194,71 +194,71 @@ Generate ATD types from grok (Grafana Object Development Kit) dashboard types
     | Textbox <json name="textbox">
     | Custom <json name="custom">
     | System <json name="system">
-  ]
+  ] <doc text="Dashboard variable type\n`query`: Query-generated list of values such as metric names, server names, sensor IDs, data centers, and so on.\n`adhoc`: Key/value filters that are automatically added to all metric queries for a data source (Prometheus, Loki, InfluxDB, and Elasticsearch only).\n`constant`: \tDefine a hidden constant.\n`datasource`: Quickly change the data source for an entire dashboard.\n`interval`: Interval variables represent time spans.\n`textbox`: Display a free text input field with an optional default value.\n`custom`: Define the variable options manually using a comma-separated list.\n`system`: Variables defined by Grafana. See: https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#global-variables">
   
-  type variableSort = int
+  type variableSort = int <doc text="Sort variable options\nAccepted values are:\n`0`: No sorting\n`1`: Alphabetical ASC\n`2`: Alphabetical DESC\n`3`: Numerical ASC\n`4`: Numerical DESC\n`5`: Alphabetical Case Insensitive ASC\n`6`: Alphabetical Case Insensitive DESC">
   
-  type variableRefresh = int
+  type variableRefresh = int <doc text="Options to config when to refresh a variable\n`0`: Never refresh the variable\n`1`: Queries the data source every time the dashboard loads.\n`2`: Queries the data source when the dashboard time range changes.">
   
   type variableOption = {
-    ?selected: bool option;
-    text: variableOptionText;
-    value: variableOptionValue;
-  }
+    ?selected <doc text="Whether the option is selected or not">: bool option;
+    text <doc text="Text to be displayed for the option">: variableOptionText;
+    value <doc text="Value of the option">: variableOptionValue;
+  } <doc text="Option to be selected in a variable.">
   
   type variableModel = {
-    type_ <json name="type">: variableType;
-    name: string;
-    ?label: string option;
-    ?hide: variableHide option;
-    ~skipUrlSync <ocaml default="false">: bool;
-    ?description: string option;
-    ?query: variableModelQuery option;
-    ?datasource: dataSourceRef option;
-    ?current: variableOption option;
-    ~multi <ocaml default="false">: bool;
-    ?options: variableOption list option;
-    ?refresh: variableRefresh option;
-    ?sort: variableSort option;
-  }
+    type_ <json name="type"> : variableType;
+    name <doc text="Name of variable">: string;
+    ?label <doc text="Optional display name">: string option;
+    ?hide : variableHide option;
+    ~skipUrlSync <doc text="Whether the variable value should be managed by URL query params or not"> <ocaml default="false">: bool;
+    ?description <doc text="Description of variable. It can be defined but `null`.">: string option;
+    ?query <doc text="Query used to fetch values for a variable">: variableModelQuery option;
+    ?datasource : dataSourceRef option;
+    ?current : variableOption option;
+    ~multi <doc text="Whether multiple values can be selected or not from variable value list"> <ocaml default="false">: bool;
+    ?options <doc text="Options that can be selected for a variable.">: variableOption list option;
+    ?refresh : variableRefresh option;
+    ?sort : variableSort option;
+  } <doc text="A variable is a placeholder for a value. You can use variables in metric queries and in panel titles.">
   
-  type variableHide = int
+  type variableHide = int <doc text="Determine if the variable shows on dashboard\nAccepted values are 0 (show label and value), 1 (show value only), 2 (show nothing).">
   
   type valueMappingResult = {
-    ?text: string option;
-    ?color: string option;
-    ?icon: string option;
-    ?index: int option;
-  }
+    ?text <doc text="Text to display when the value matches">: string option;
+    ?color <doc text="Text to use when the value matches">: string option;
+    ?icon <doc text="Icon to display when the value matches. Only specific visualizations.">: string option;
+    ?index <doc text="Position in the mapping array. Only used internally.">: int option;
+  } <doc text="Result used as replacement with text and color when the value matches">
   
   type valueMapping = [
     | ValueMap of valueMap
     | RangeMap of rangeMap
     | RegexMap of regexMap
     | SpecialValueMap of specialValueMap
-  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of">
+  ] <json adapter.ocaml="Jsonschema2atd_runtime.Adapter.One_of"> <doc text="Allow to transform the visual representation of specific data values in a visualization, irrespective of their original units">
   
   type valueMap = {
-    type_ <json name="type">: valueMapType;
-    options: json;
-  }
+    type_ <json name="type"> : valueMapType;
+    options <doc text="Map with <value_to_match>: ValueMappingResult. For example: { \"10\": { text: \"Perfection!\", color: \"green\" } }">: json;
+  } <doc text="Maps text values to a color or different display text and color.\nFor example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.">
   
   type thresholdsMode = [
     | Absolute <json name="absolute">
     | Percentage <json name="percentage">
-  ]
+  ] <doc text="Thresholds can either be `absolute` (specific number) or `percentage` (relative to min or max, it will be values between 0 and 1).">
   
   type thresholdsConfig = {
-    mode: thresholdsMode;
-    steps: threshold list;
-  }
+    mode : thresholdsMode;
+    steps <doc text="Must be sorted by 'value', first value is always -Infinity">: threshold list;
+  } <doc text="Thresholds configuration for the panel">
   
   type threshold = {
-    value: float;
-    color: string;
-  }
+    value <doc text="Value represents a specified metric for the threshold, which triggers a visual change in the dashboard when this value is met or exceeded.\nNulls currently appear here when serializing -Infinity to JSON.">: float;
+    color <doc text="Color represents the color of the visual change that will occur in the dashboard when the threshold value is met or exceeded.">: string;
+  } <doc text="User-defined value for a metric that triggers visual changes in a panel when this value is met or exceeded\nThey are used to conditionally style and color visualizations based on query results , and can be applied to most visualizations.">
   
-  type target = json
+  type target = json <doc text="Schema for panel targets is specified by datasource\nplugins. We use a placeholder definition, which the Go\nschema loader either left open/as-is with the Base\nvariant of the Dashboard and Panel families, or filled\nwith types derived from plugins in the Instance variant.\nWhen working directly from CUE, importers can extend this\ntype directly to achieve the same effect.">
   
   type specialValueMatch = [
     | True_ <json name="true">
@@ -267,137 +267,137 @@ Generate ATD types from grok (Grafana Object Development Kit) dashboard types
     | Nan <json name="nan">
     | Nullnan <json name="null+nan">
     | Empty <json name="empty">
-  ]
+  ] <doc text="Special value types supported by the `SpecialValueMap`">
   
   type specialValueMap = {
-    type_ <json name="type">: specialValueMapType;
-    options: specialValueMapOptions;
-  }
+    type_ <json name="type"> : specialValueMapType;
+    options : specialValueMapOptions;
+  } <doc text="Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color.\nSee SpecialValueMatch to see the list of special values.\nFor example, you can configure a special value mapping so that null values appear as N/A.">
   
   type snapshot = {
-    created: string;
-    expires: string;
-    external_ <json name="external">: bool;
-    externalUrl: string;
-    id: int;
-    key: string;
-    name: string;
-    orgId: int;
-    updated: string;
-    ?url: string option;
-    userId: int;
-  }
+    created <doc text="Time when the snapshot was created">: string;
+    expires <doc text="Time when the snapshot expires, default is never to expire">: string;
+    external_ <json name="external"> <doc text="Is the snapshot saved in an external grafana instance">: bool;
+    externalUrl <doc text="external url, if snapshot was shared in external grafana instance">: string;
+    id <doc text="Unique identifier of the snapshot">: int;
+    key <doc text="Optional, defined the unique key of the snapshot, required if external is true">: string;
+    name <doc text="Optional, name of the snapshot">: string;
+    orgId <doc text="org id of the snapshot">: int;
+    updated <doc text="last time when the snapshot was updated">: string;
+    ?url <doc text="url of the snapshot, if snapshot was shared internally">: string option;
+    userId <doc text="user id of the snapshot creator">: int;
+  } <doc text="A dashboard snapshot shares an interactive dashboard publicly.\nIt is a read-only version of a dashboard, and is not editable.\nIt is possible to create a snapshot of a snapshot.\nGrafana strips away all sensitive information from the dashboard.\nSensitive information stripped: queries (metric, template,annotation) and panel links.">
   
   type rowPanel = {
-    type_ <json name="type">: rowPanelType;
-    ~collapsed <ocaml default="false">: bool;
-    ?title: string option;
-    ?datasource: dataSourceRef option;
-    ?gridPos: gridPos option;
-    id: int;
-    panels: rowPanelPanels list;
-    ?repeat: string option;
-  }
+    type_ <json name="type"> <doc text="The panel type">: rowPanelType;
+    ~collapsed <doc text="Whether this row should be collapsed or not."> <ocaml default="false">: bool;
+    ?title <doc text="Row title">: string option;
+    ?datasource : dataSourceRef option;
+    ?gridPos : gridPos option;
+    id <doc text="Unique identifier of the panel. Generated by Grafana when creating a new panel. It must be unique within a dashboard, but not globally.">: int;
+    panels <doc text="List of panels in the row">: rowPanelPanels list;
+    ?repeat <doc text="Name of template variable to repeat for.">: string option;
+  } <doc text="Row panel">
   
   type regexMap = {
-    type_ <json name="type">: regexMapType;
-    options: regexMapOptions;
-  }
+    type_ <json name="type"> : regexMapType;
+    options <doc text="Regular expression to match against and the result to apply when the value matches the regex">: regexMapOptions;
+  } <doc text="Maps regular expressions to replacement text and a color.\nFor example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.">
   
   type rangeMap = {
-    type_ <json name="type">: rangeMapType;
-    options: rangeMapOptions;
-  }
+    type_ <json name="type"> : rangeMapType;
+    options <doc text="Range to match against and the result to apply when the value is within the range">: rangeMapOptions;
+  } <doc text="Maps numerical ranges to a display text and color.\nFor example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.">
   
   type panel = {
-    type_ <json name="type">: string;
-    ?id: int option;
-    ?pluginVersion: string option;
-    ?tags: string list option;
-    ?targets: target list option;
-    ?title: string option;
-    ?description: string option;
-    ~transparent <ocaml default="false">: bool;
-    ?datasource: dataSourceRef option;
-    ?gridPos: gridPos option;
-    ?links: dashboardLink list option;
-    ?repeat: string option;
-    ~repeatDirection <ocaml default="`H">: panelRepeatDirection;
-    ?maxPerRow: float option;
-    ?maxDataPoints: float option;
-    ?transformations: dataTransformerConfig list option;
-    ?interval: string option;
-    ?timeFrom: string option;
-    ?timeShift: string option;
-    ?hideTimeOverride: bool option;
-    ?libraryPanel: libraryPanelRef option;
-    ?options: json option;
-    ?fieldConfig: fieldConfigSource option;
-  }
+    type_ <json name="type"> <doc text="The panel plugin type id. This is used to find the plugin to display the panel.">: string;
+    ?id <doc text="Unique identifier of the panel. Generated by Grafana when creating a new panel. It must be unique within a dashboard, but not globally.">: int option;
+    ?pluginVersion <doc text="The version of the plugin that is used for this panel. This is used to find the plugin to display the panel and to migrate old panel configs.">: string option;
+    ?tags <doc text="Tags for the panel.">: string list option;
+    ?targets <doc text="Depends on the panel plugin. See the plugin documentation for details.">: target list option;
+    ?title <doc text="Panel title.">: string option;
+    ?description <doc text="Panel description.">: string option;
+    ~transparent <doc text="Whether to display the panel without a background."> <ocaml default="false">: bool;
+    ?datasource : dataSourceRef option;
+    ?gridPos : gridPos option;
+    ?links <doc text="Panel links.">: dashboardLink list option;
+    ?repeat <doc text="Name of template variable to repeat for.">: string option;
+    ~repeatDirection <doc text="Direction to repeat in if 'repeat' is set.\n`h` for horizontal, `v` for vertical."> <ocaml default="`H">: panelRepeatDirection;
+    ?maxPerRow <doc text="Option for repeated panels that controls max items per row\nOnly relevant for horizontally repeated panels">: float option;
+    ?maxDataPoints <doc text="The maximum number of data points that the panel queries are retrieving.">: float option;
+    ?transformations <doc text="List of transformations that are applied to the panel data before rendering.\nWhen there are multiple transformations, Grafana applies them in the order they are listed.\nEach transformation creates a result set that then passes on to the next transformation in the processing pipeline.">: dataTransformerConfig list option;
+    ?interval <doc text="The min time interval setting defines a lower limit for the $__interval and $__interval_ms variables.\nThis value must be formatted as a number followed by a valid time\nidentifier like: \"40s\", \"3d\", etc.\nSee: https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/#query-options">: string option;
+    ?timeFrom <doc text="Overrides the relative time range for individual panels,\nwhich causes them to be different than what is selected in\nthe dashboard time picker in the top-right corner of the dashboard. You can use this to show metrics from different\ntime periods or days on the same dashboard.\nThe value is formatted as time operation like: `now-5m` (Last 5 minutes), `now/d` (the day so far),\n`now-5d/d`(Last 5 days), `now/w` (This week so far), `now-2y/y` (Last 2 years).\nNote: Panel time overrides have no effect when the dashboard\226\128\153s time range is absolute.\nSee: https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/#query-options">: string option;
+    ?timeShift <doc text="Overrides the time range for individual panels by shifting its start and end relative to the time picker.\nFor example, you can shift the time range for the panel to be two hours earlier than the dashboard time picker setting `2h`.\nNote: Panel time overrides have no effect when the dashboard\226\128\153s time range is absolute.\nSee: https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/#query-options">: string option;
+    ?hideTimeOverride <doc text="Controls if the timeFrom or timeShift overrides are shown in the panel header">: bool option;
+    ?libraryPanel : libraryPanelRef option;
+    ?options <doc text="It depends on the panel plugin. They are specified by the Options field in panel plugin schemas.">: json option;
+    ?fieldConfig : fieldConfigSource option;
+  } <doc text="Dashboard panels are the basic visualization building blocks.">
   
   type matcherConfig = {
-    ~id <ocaml default="\"\"">: string;
-    ?options: json option;
-  }
+    ~id <doc text="The matcher id. This is used to find the matcher implementation from registry."> <ocaml default="\"\"">: string;
+    ?options <doc text="The matcher options. This is specific to the matcher implementation.">: json option;
+  } <doc text="Matcher is a predicate configuration. Based on the config a set of field(s) or values is filtered in order to apply override / transformation.\nIt comes with in id ( to resolve implementation from registry) and a configuration that\226\128\153s specific to a particular matcher type.">
   
   type mappingType = [
     | Value <json name="value">
     | Range <json name="range">
     | Regex <json name="regex">
     | Special <json name="special">
-  ]
+  ] <doc text="Supported value mapping types\n`value`: Maps text values to a color or different display text and color. For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.\n`range`: Maps numerical ranges to a display text and color. For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.\n`regex`: Maps regular expressions to replacement text and a color. For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.\n`special`: Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color. See SpecialValueMatch to see the list of special values. For example, you can configure a special value mapping so that null values appear as N/A.">
   
   type libraryPanelRef = {
-    name: string;
-    uid: string;
-  }
+    name <doc text="Library panel name">: string;
+    uid <doc text="Library panel uid">: string;
+  } <doc text="A library panel is a reusable panel that you can use in any dashboard.\nWhen you make a change to a library panel, that change propagates to all instances of where the panel is used.\nLibrary panels streamline reuse of panels across multiple dashboards.">
   
   type heatmapPanel = {
-    type_ <json name="type">: heatmapPanelType;
-  }
+    type_ <json name="type"> : heatmapPanelType;
+  } <doc text="Support for legacy heatmap panel.\n@deprecated this a deprecated panel type">
   
   type gridPos = {
-    ~h <ocaml default="9">: int;
-    ~w <ocaml default="12">: int;
-    ~x <ocaml default="0">: int;
-    ~y <ocaml default="0">: int;
-    ?static: bool option;
-  }
+    ~h <doc text="Panel height. The height is the number of rows from the top edge of the panel."> <ocaml default="9">: int;
+    ~w <doc text="Panel width. The width is the number of columns from the left edge of the panel."> <ocaml default="12">: int;
+    ~x <doc text="Panel x. The x coordinate is the number of columns from the left edge of the grid"> <ocaml default="0">: int;
+    ~y <doc text="Panel y. The y coordinate is the number of rows from the top edge of the grid"> <ocaml default="0">: int;
+    ?static <doc text="Whether the panel is fixed within the grid. If true, the panel will not be affected by other panels' interactions">: bool option;
+  } <doc text="Position and dimensions of a panel in the grid">
   
   type graphPanel = {
-    type_ <json name="type">: graphPanelType;
-    ?legend: graphPanelLegend option;
-  }
+    type_ <json name="type"> : graphPanelType;
+    ?legend <doc text="@deprecated this is part of deprecated graph panel">: graphPanelLegend option;
+  } <doc text="Support for legacy graph panel.\n@deprecated this a deprecated panel type">
   
   type fieldConfigSource = {
-    defaults: fieldConfig;
-    overrides: fieldConfigSourceOverrides list;
-  }
+    defaults : fieldConfig;
+    overrides <doc text="Overrides are the options applied to specific fields overriding the defaults.">: fieldConfigSourceOverrides list;
+  } <doc text="The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.\nEach column within this structure is called a field. A field can represent a single time series or table column.\nField options allow you to change how the data is displayed in your visualizations.">
   
   type fieldConfig = {
-    ?displayName: string option;
-    ?displayNameFromDS: string option;
-    ?description: string option;
-    ?path: string option;
-    ?writeable: bool option;
-    ?filterable: bool option;
-    ?unit: string option;
-    ?decimals: float option;
-    ?min: float option;
-    ?max: float option;
-    ?mappings: valueMapping list option;
-    ?thresholds: thresholdsConfig option;
-    ?color: fieldColor option;
-    ?links: json list option;
-    ?noValue: string option;
-    ?custom: json option;
-  }
+    ?displayName <doc text="The display value for this field.  This supports template variables blank is auto">: string option;
+    ?displayNameFromDS <doc text="This can be used by data sources that return and explicit naming structure for values and labels\nWhen this property is configured, this value is used rather than the default naming strategy.">: string option;
+    ?description <doc text="Human readable field metadata">: string option;
+    ?path <doc text="An explicit path to the field in the datasource.  When the frame meta includes a path,\nThis will default to `${frame.meta.path}/${field.name}\n\nWhen defined, this value can be used as an identifier within the datasource scope, and\nmay be used to update the results">: string option;
+    ?writeable <doc text="True if data source can write a value to the path. Auth/authz are supported separately">: bool option;
+    ?filterable <doc text="True if data source field supports ad-hoc filters">: bool option;
+    ?unit <doc text="Unit a field should use. The unit you select is applied to all fields except time.\nYou can use the units ID availables in Grafana or a custom unit.\nAvailable units in Grafana: https://github.com/grafana/grafana/blob/main/packages/grafana-data/src/valueFormats/categories.ts\nAs custom unit, you can use the following formats:\n`suffix:<suffix>` for custom unit that should go after value.\n`prefix:<prefix>` for custom unit that should go before value.\n`time:<format>` For custom date time formats type for example `time:YYYY-MM-DD`.\n`si:<base scale><unit characters>` for custom SI units. For example: `si: mF`. This one is a bit more advanced as you can specify both a unit and the source data scale. So if your source data is represented as milli (thousands of) something prefix the unit with that SI scale character.\n`count:<unit>` for a custom count unit.\n`currency:<unit>` for custom a currency unit.">: string option;
+    ?decimals <doc text="Specify the number of decimals Grafana includes in the rendered value.\nIf you leave this field blank, Grafana automatically truncates the number of decimals based on the value.\nFor example 1.1234 will display as 1.12 and 100.456 will display as 100.\nTo display all decimals, set the unit to `String`.">: float option;
+    ?min <doc text="The minimum value used in percentage threshold calculations. Leave blank for auto calculation based on all series and fields.">: float option;
+    ?max <doc text="The maximum value used in percentage threshold calculations. Leave blank for auto calculation based on all series and fields.">: float option;
+    ?mappings <doc text="Convert input values into a display string">: valueMapping list option;
+    ?thresholds : thresholdsConfig option;
+    ?color : fieldColor option;
+    ?links <doc text="The behavior when clicking on a result">: json list option;
+    ?noValue <doc text="Alternative to empty string">: string option;
+    ?custom <doc text="custom is specified by the FieldConfig field\nin panel plugin schemas.">: json option;
+  } <doc text="The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.\nEach column within this structure is called a field. A field can represent a single time series or table column.\nField options allow you to change how the data is displayed in your visualizations.">
   
   type fieldColorSeriesByMode = [
     | Min <json name="min">
     | Max <json name="max">
     | Last <json name="last">
-  ]
+  ] <doc text="Defines how to assign a series color from \"by value\" color schemes. For example for an aggregated data points like a timeseries, the color can be assigned by the min, max or last value.">
   
   type fieldColorModeId = [
     | Thresholds <json name="thresholds">
@@ -415,75 +415,75 @@ Generate ATD types from grok (Grafana Object Development Kit) dashboard types
     | Continuouspurples <json name="continuous-purples">
     | Fixed <json name="fixed">
     | Shades <json name="shades">
-  ]
+  ] <doc text="Color mode for a field. You can specify a single color, or select a continuous (gradient) color schemes, based on a value.\nContinuous color interpolates a color using the percentage of a value relative to min and max.\nAccepted values are:\n`thresholds`: From thresholds. Informs Grafana to take the color from the matching threshold\n`palette-classic`: Classic palette. Grafana will assign color by looking up a color in a palette by series index. Useful for Graphs and pie charts and other categorical data visualizations\n`palette-classic-by-name`: Classic palette (by name). Grafana will assign color by looking up a color in a palette by series name. Useful for Graphs and pie charts and other categorical data visualizations\n`continuous-GrYlRd`: ontinuous Green-Yellow-Red palette mode\n`continuous-RdYlGr`: Continuous Red-Yellow-Green palette mode\n`continuous-BlYlRd`: Continuous Blue-Yellow-Red palette mode\n`continuous-YlRd`: Continuous Yellow-Red palette mode\n`continuous-BlPu`: Continuous Blue-Purple palette mode\n`continuous-YlBl`: Continuous Yellow-Blue palette mode\n`continuous-blues`: Continuous Blue palette mode\n`continuous-reds`: Continuous Red palette mode\n`continuous-greens`: Continuous Green palette mode\n`continuous-purples`: Continuous Purple palette mode\n`shades`: Shades of a single color. Specify a single color, useful in an override rule.\n`fixed`: Fixed color mode. Specify a single color, useful in an override rule.">
   
   type fieldColor = {
-    mode: fieldColorModeId;
-    ?fixedColor: string option;
-    ?seriesBy: fieldColorSeriesByMode option;
-  }
+    mode : fieldColorModeId;
+    ?fixedColor <doc text="The fixed color value for fixed or shades color modes.">: string option;
+    ?seriesBy : fieldColorSeriesByMode option;
+  } <doc text="Map a field to a color.">
   
   type dynamicConfigValue = {
-    ~id <ocaml default="\"\"">: string;
-    ?value: json option;
-  }
+    ~id  <ocaml default="\"\"">: string;
+    ?value : json option;
+  } 
   
   type dataTransformerConfig = {
-    id: string;
-    ?disabled: bool option;
-    ?filter: matcherConfig option;
-    options: json;
-  }
+    id <doc text="Unique identifier of transformer">: string;
+    ?disabled <doc text="Disabled transformations are skipped">: bool option;
+    ?filter : matcherConfig option;
+    options <doc text="Options to be passed to the transformer\nValid options depend on the transformer id">: json;
+  } <doc text="Transformations allow to manipulate data returned by a query before the system applies a visualization.\nUsing transformations you can: rename fields, join time series data, perform mathematical operations across queries,\nuse the output of one transformation as the input to another transformation, etc.">
   
   type dataSourceRef = {
-    ?type_ <json name="type">: string option;
-    ?uid: string option;
-  }
+    ?type_ <json name="type"> <doc text="The plugin type-id">: string option;
+    ?uid <doc text="Specific datasource instance">: string option;
+  } <doc text="Ref to a DataSource instance">
   
   type dashboardLinkType = [
     | Link <json name="link">
     | Dashboards <json name="dashboards">
-  ]
+  ] <doc text="Dashboard Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)">
   
   type dashboardLink = {
-    title: string;
-    type_ <json name="type">: dashboardLinkType;
-    icon: string;
-    tooltip: string;
-    url: string;
-    tags: string list;
-    ~asDropdown <ocaml default="false">: bool;
-    ~targetBlank <ocaml default="false">: bool;
-    ~includeVars <ocaml default="false">: bool;
-    ~keepTime <ocaml default="false">: bool;
-  }
+    title <doc text="Title to display with the link">: string;
+    type_ <json name="type"> : dashboardLinkType;
+    icon <doc text="Icon name to be displayed with the link">: string;
+    tooltip <doc text="Tooltip to display when the user hovers their mouse over it">: string;
+    url <doc text="Link URL. Only required/valid if the type is link">: string;
+    tags <doc text="List of tags to limit the linked dashboards. If empty, all dashboards will be displayed. Only valid if the type is dashboards">: string list;
+    ~asDropdown <doc text="If true, all dashboards links will be displayed in a dropdown. If false, all dashboards links will be displayed side by side. Only valid if the type is dashboards"> <ocaml default="false">: bool;
+    ~targetBlank <doc text="If true, the link will be opened in a new tab"> <ocaml default="false">: bool;
+    ~includeVars <doc text="If true, includes current template variables values in the link as query params"> <ocaml default="false">: bool;
+    ~keepTime <doc text="If true, includes current time range in the link as query params"> <ocaml default="false">: bool;
+  } <doc text="Links with references to other dashboards or external resources">
   
-  type dashboardCursorSync = int
+  type dashboardCursorSync = int <doc text="0 for no shared crosshair or tooltip (default).\n1 for shared crosshair.\n2 for shared crosshair AND shared tooltip.">
   
   type annotationTarget = {
-    limit: int64;
-    matchAny: bool;
-    tags: string list;
-    type_ <json name="type">: string;
-  }
+    limit <doc text="Only required/valid for the grafana datasource...\nbut code+tests is already depending on it so hard to change">: int64;
+    matchAny <doc text="Only required/valid for the grafana datasource...\nbut code+tests is already depending on it so hard to change">: bool;
+    tags <doc text="Only required/valid for the grafana datasource...\nbut code+tests is already depending on it so hard to change">: string list;
+    type_ <json name="type"> <doc text="Only required/valid for the grafana datasource...\nbut code+tests is already depending on it so hard to change">: string;
+  } <doc text="TODO: this should be a regular DataQuery that depends on the selected dashboard\nthese match the properties of the \"grafana\" datasouce that is default in most dashboards">
   
   type annotationQuery = {
-    name: string;
-    datasource: dataSourceRef;
-    ~enable <ocaml default="true">: bool;
-    ~hide <ocaml default="false">: bool;
-    iconColor: string;
-    ?filter: annotationPanelFilter option;
-    ?target: annotationTarget option;
-    ?type_ <json name="type">: string option;
-    ~builtIn <ocaml default="0">: float;
-  }
+    name <doc text="Name of annotation.">: string;
+    datasource : dataSourceRef;
+    ~enable <doc text="When enabled the annotation query is issued with every dashboard refresh"> <ocaml default="true">: bool;
+    ~hide <doc text="Annotation queries can be toggled on or off at the top of the dashboard.\nWhen hide is true, the toggle is not shown in the dashboard."> <ocaml default="false">: bool;
+    iconColor <doc text="Color to use for the annotation event markers">: string;
+    ?filter : annotationPanelFilter option;
+    ?target : annotationTarget option;
+    ?type_ <json name="type"> <doc text="TODO -- this should not exist here, it is based on the --grafana-- datasource">: string option;
+    ~builtIn <doc text="Set to 1 for the standard annotation query all dashboards have by default."> <ocaml default="0">: float;
+  } <doc text="TODO docs\nFROM: AnnotationQuery in grafana-data/src/types/annotations.ts">
   
   type annotationPanelFilter = {
-    ~exclude <ocaml default="false">: bool;
-    ids: int list;
-  }
+    ~exclude <doc text="Should the specified panels be included or excluded"> <ocaml default="false">: bool;
+    ids <doc text="Panel IDs that should be included or excluded">: int list;
+  } 
   
   type annotationContainer = {
-    ?list: annotationQuery list option;
-  }
+    ?list <doc text="List of annotations">: annotationQuery list option;
+  } <doc text="Contains the list of annotations that are associated with the dashboard.\nAnnotations are used to overlay event markers and overlay event tags on graphs.\nGrafana comes with a native annotation store and the ability to add annotation events directly from the graph panel or via the HTTP API.\nSee https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/">
