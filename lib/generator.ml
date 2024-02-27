@@ -23,17 +23,26 @@ let process_int_type schema =
   | _ -> failwith "int has unextected format"
 
 let get_ref_name ref =
-  match String.split_on_char '/' ref with
+  let uri, pointer =
+    match String.split_on_char '#' ref with
+    | [ uri; pointer ] -> uri, Some pointer
+    | [ uri ] -> uri, None
+    | _ -> failwith (sprintf "Unsupported remote ref value: %s. The URI contains multiple '#'." ref)
+  in
+  let name_of_path path =
+    match path |> String.split_on_char '/' |> List.rev |> List.hd with
+    | exception _ -> failwith (sprintf "Unsupported ref value: %s" ref)
+    | name -> name
+  in
+  match pointer with
+  | None -> name_of_path uri
+  | Some pointer ->
+  match String.split_on_char '/' pointer with
   (* OpenAPI defs *)
-  | [ "#"; "components"; "schemas"; type_name ] -> type_name
+  | [ ""; "components"; "schemas"; type_name ] -> type_name
   (* JSON Schema defs *)
-  | [ "#"; ("$defs" | "definitions"); type_name ] -> type_name
-  | _ ->
-    failwith
-      (Printf.sprintf
-         "Unsupported ref value: %s. Supported ref URI are: #/components/schemas/* and #/$defs/* and #/definitions/*"
-         ref
-      )
+  | [ ""; ("$defs" | "definitions"); type_name ] -> type_name
+  | _ -> name_of_path pointer
 
 let output = Buffer.create 16
 let input_toplevel_schemas = ref []
