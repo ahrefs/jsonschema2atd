@@ -27,6 +27,10 @@ type number_format = [
 type str_format = [
   | Date <json name="date">
   | Datetime <json name="date-time">
+  | Time <json name="time">
+  | Duration <json name="duration">
+  | Email <json name="email">
+  | Idn_email <json name="idn-email">
 ]
 
 type format = [
