@@ -60,7 +60,7 @@ type schema = {
 
   (* 6.1 validation for any instance type *)
   ~typ <json name="type">: typ nullable;
-  ~enum : string nonempty_list nullable;
+  ~enum : json nonempty_list nullable;
 
   (* 6.2 validation for numeric instances *)
   (* ~multiple_of <json name="multipleOf">: float nullable; *)

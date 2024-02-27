@@ -141,7 +141,16 @@ let rec process_schema_type ~ancestors (schema : schema) =
   | Some schemas -> process_one_of ~ancestors schemas
   | None ->
   match schema.enum, schema.typ with
-  | Some enums, Some String -> process_enums enums
+  | Some enums, Some String -> process_string_enums enums
+  | Some _, Some Integer ->
+    (* this is more lenient than it should *)
+    maybe_nullable (process_int_type schema)
+  | Some _, Some Number ->
+    (* this is more lenient than it should *)
+    maybe_nullable "float"
+  | Some _, Some Boolean ->
+    (* this is more lenient than it should *)
+    maybe_nullable "bool"
   | Some _, _ -> failwith "only string enums are supported"
   | None, _ ->
   match schema.typ with
@@ -217,7 +226,19 @@ and process_one_of ~ancestors (schemas_or_refs : schema or_ref list) =
   let variants = List.map make_one_of_variant schemas_or_refs |> String.concat "\n" in
   sprintf "[\n%s\n] <json adapter.ocaml=\"Jsonschema2atd_runtime.Adapter.One_of\">" variants
 
-and process_enums enums =
+and process_string_enums enums =
+  let enums =
+    List.map
+      (function
+        | `String s -> s
+        | value ->
+          failwith
+            (sprintf "Invalid value %s in string enum %s" (Yojson.Basic.to_string value)
+               (Yojson.Basic.to_string (`List enums))
+            )
+        )
+      enums
+  in
   let make_enum_variant value = sprintf {|  | %s <json name="%s">|} (variant_name value) value in
   let variants = List.map make_enum_variant enums |> String.concat "\n" in
   sprintf "[\n%s\n]" variants
