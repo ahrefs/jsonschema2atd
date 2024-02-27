@@ -98,3 +98,7 @@ let shortest_list lists = lists |> List.sort (fun a b -> compare (List.length a)
 let nonempty_list_opt = function
   | [] -> None
   | non_empty_list -> Some non_empty_list
+
+let list_of_nonempty = function
+  | None -> []
+  | Some l -> l

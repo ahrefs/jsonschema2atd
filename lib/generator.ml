@@ -19,19 +19,21 @@ let get_ref_name ref =
   (* OpenAPI defs *)
   | [ "#"; "components"; "schemas"; type_name ] -> type_name
   (* JSON Schema defs *)
-  | [ "#"; "$defs"; type_name ] -> type_name
+  | [ "#"; ("$defs" | "definitions"); type_name ] -> type_name
   | _ ->
     failwith
-      (Printf.sprintf "Unsupported ref value: %s. Supported ref URI are: #/components/schemas/* and #/$defs/*" ref)
+      (Printf.sprintf
+         "Unsupported ref value: %s. Supported ref URI are: #/components/schemas/* and #/$defs/* and #/definitions/*"
+         ref
+      )
 
 let output = Buffer.create 16
 let input_toplevel_schemas = ref []
 
 let get_schema_by_ref ~schema ref =
   let defs =
-    match schema.defs with
-    | None -> !input_toplevel_schemas
-    | Some defs -> defs @ !input_toplevel_schemas
+    let defs = List.concat_map Utils.list_of_nonempty [ schema.defs; schema.definitions ] in
+    defs @ !input_toplevel_schemas
   in
   List.find_map
     (function
@@ -107,6 +109,7 @@ let merge_all_of schema =
       dependent_required = merge_lists (fun schema -> schema.dependent_required);
       format = take_first_opt (fun schema -> schema.format);
       defs = merge_opt_lists (fun schema -> schema.defs);
+      definitions = merge_opt_lists (fun schema -> schema.definitions);
       title = take_first_opt (fun schema -> schema.title);
       typ = take_first_opt (fun schema -> schema.typ);
       description = take_first_opt (fun schema -> schema.description);
@@ -222,9 +225,8 @@ let make_atd_of_jsonschema input =
   let schema = Json_schema_j.schema_of_string input in
   let root_type_name = Option.value ~default:"root" schema.title in
   let defs =
-    match schema.defs with
-    | None -> []
-    | Some defs -> List.map (fun (name, schema) -> name, Obj schema) defs
+    let defs = List.concat_map Utils.list_of_nonempty [ schema.defs; schema.definitions ] in
+    List.map (fun (name, schema) -> name, Obj schema) defs
   in
   make_atd_of_schemas ([ root_type_name, Obj schema ] @ defs)
 

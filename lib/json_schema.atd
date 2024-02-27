@@ -88,6 +88,7 @@ type schema = {
 
   (* 8.2.4. re-usable JSON Schemas *)
   ~defs <json name="$defs">: (string * schema) list <json repr="object"> nullable;
+  ~definitions: (string * schema) list <json repr="object"> nullable;
 
   (* 9. basic metadata annotations *)
   ~title : string nullable;
