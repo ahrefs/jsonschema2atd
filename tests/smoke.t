@@ -50,6 +50,8 @@ Generate ATD out of JSON Schema that contains defs
   type json <ocaml module="Yojson.Basic" t="t"> = abstract
   type int64 = int <ocaml repr="int64">
   
+  type name = string
+  
   type root = {
     first_name: name;
     last_name: name;

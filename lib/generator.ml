@@ -221,7 +221,12 @@ let make_atd_of_schemas schemas =
 let make_atd_of_jsonschema input =
   let schema = Json_schema_j.schema_of_string input in
   let root_type_name = Option.value ~default:"root" schema.title in
-  make_atd_of_schemas [ root_type_name, Obj schema ]
+  let defs =
+    match schema.defs with
+    | None -> []
+    | Some defs -> List.map (fun (name, schema) -> name, Obj schema) defs
+  in
+  make_atd_of_schemas ([ root_type_name, Obj schema ] @ defs)
 
 let make_atd_of_openapi input =
   let root = Openapi_j.root_of_string input in
