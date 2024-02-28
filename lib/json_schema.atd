@@ -27,6 +27,10 @@ type number_format = [
 type str_format = [
   | Date <json name="date">
   | Datetime <json name="date-time">
+  | Time <json name="time">
+  | Duration <json name="duration">
+  | Email <json name="email">
+  | Idn_email <json name="idn-email">
 ]
 
 type format = [
@@ -56,7 +60,7 @@ type schema = {
 
   (* 6.1 validation for any instance type *)
   ~typ <json name="type">: typ nullable;
-  ~enum : string nonempty_list nullable;
+  ~enum : json nonempty_list nullable;
 
   (* 6.2 validation for numeric instances *)
   (* ~multiple_of <json name="multipleOf">: float nullable; *)
@@ -88,6 +92,7 @@ type schema = {
 
   (* 8.2.4. re-usable JSON Schemas *)
   ~defs <json name="$defs">: (string * schema) list <json repr="object"> nullable;
+  ~definitions: (string * schema) list <json repr="object"> nullable;
 
   (* 9. basic metadata annotations *)
   ~title : string nullable;

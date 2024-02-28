@@ -6,7 +6,15 @@ let record_field_name str =
   let cleaned_field_name = Utils.sanitize_name str in
   if String.equal str cleaned_field_name then str else sprintf {|%s <json name="%s">|} cleaned_field_name str
 
-let define_type name type_ = sprintf "type %s = %s\n" (type_name name) type_
+let doc_annotation text = sprintf {|<doc text=%S>|} text
+
+let define_type ~doc ~name ~type_ =
+  let doc =
+    match doc with
+    | None -> ""
+    | Some doc -> doc_annotation doc
+  in
+  sprintf "type %s = %s %s\n" (type_name name) type_ doc
 
 let process_int_type schema =
   match schema.format with
@@ -15,23 +23,34 @@ let process_int_type schema =
   | _ -> failwith "int has unextected format"
 
 let get_ref_name ref =
-  match String.split_on_char '/' ref with
+  let uri, pointer =
+    match String.split_on_char '#' ref with
+    | [ uri; pointer ] -> uri, Some pointer
+    | [ uri ] -> uri, None
+    | _ -> failwith (sprintf "Unsupported remote ref value: %s. The URI contains multiple '#'." ref)
+  in
+  let name_of_path path =
+    match path |> String.split_on_char '/' |> List.rev |> List.hd with
+    | exception _ -> failwith (sprintf "Unsupported ref value: %s" ref)
+    | name -> name
+  in
+  match pointer with
+  | None -> name_of_path uri
+  | Some pointer ->
+  match String.split_on_char '/' pointer with
   (* OpenAPI defs *)
-  | [ "#"; "components"; "schemas"; type_name ] -> type_name
+  | [ ""; "components"; "schemas"; type_name ] -> type_name
   (* JSON Schema defs *)
-  | [ "#"; "$defs"; type_name ] -> type_name
-  | _ ->
-    failwith
-      (Printf.sprintf "Unsupported ref value: %s. Supported ref URI are: #/components/schemas/* and #/$defs/*" ref)
+  | [ ""; ("$defs" | "definitions"); type_name ] -> type_name
+  | _ -> name_of_path pointer
 
 let output = Buffer.create 16
 let input_toplevel_schemas = ref []
 
 let get_schema_by_ref ~schema ref =
   let defs =
-    match schema.defs with
-    | None -> !input_toplevel_schemas
-    | Some defs -> defs @ !input_toplevel_schemas
+    let defs = List.concat_map Utils.list_of_nonempty [ schema.defs; schema.definitions ] in
+    defs @ !input_toplevel_schemas
   in
   List.find_map
     (function
@@ -107,6 +126,7 @@ let merge_all_of schema =
       dependent_required = merge_lists (fun schema -> schema.dependent_required);
       format = take_first_opt (fun schema -> schema.format);
       defs = merge_opt_lists (fun schema -> schema.defs);
+      definitions = merge_opt_lists (fun schema -> schema.definitions);
       title = take_first_opt (fun schema -> schema.title);
       typ = take_first_opt (fun schema -> schema.typ);
       description = take_first_opt (fun schema -> schema.description);
@@ -121,7 +141,16 @@ let rec process_schema_type ~ancestors (schema : schema) =
   | Some schemas -> process_one_of ~ancestors schemas
   | None ->
   match schema.enum, schema.typ with
-  | Some enums, Some String -> process_enums enums
+  | Some enums, Some String -> process_string_enums enums
+  | Some _, Some Integer ->
+    (* this is more lenient than it should *)
+    maybe_nullable (process_int_type schema)
+  | Some _, Some Number ->
+    (* this is more lenient than it should *)
+    maybe_nullable "float"
+  | Some _, Some Boolean ->
+    (* this is more lenient than it should *)
+    maybe_nullable "bool"
   | Some _, _ -> failwith "only string enums are supported"
   | None, _ ->
   match schema.typ with
@@ -144,7 +173,9 @@ and process_nested_schema_type ~ancestors schema =
   match merge_all_of schema with
   | { one_of = Some _; _ } | { typ = Some Object; properties = Some _; _ } | { enum = Some _; _ } ->
     let nested_type_name = concat_camelCase (List.rev ancestors) in
-    let nested = define_type nested_type_name (process_schema_type ~ancestors schema) in
+    let nested =
+      define_type ~name:nested_type_name ~type_:(process_schema_type ~ancestors schema) ~doc:schema.description
+    in
     Buffer.add_string output (nested ^ "\n");
     type_name nested_type_name
   | _ -> process_schema_type ~ancestors schema
@@ -154,11 +185,19 @@ and process_object_type ~ancestors schema =
   let make_record_field (field_name, schema_or_ref) =
     let type_ = make_type_from_schema_or_ref ~ancestors:(field_name :: ancestors) schema_or_ref in
     let record_field_name = record_field_name field_name in
+    let doc =
+      let content =
+        match schema_or_ref with
+        | Ref _ -> None
+        | Obj schema -> schema.description
+      in
+      Option.map doc_annotation content |> Option.value ~default:""
+    in
     match schema_or_ref, is_required field_name with
     | Obj { default = Some default; enum; _ }, _ ->
-      sprintf "  ~%s <ocaml default=\"%s\">: %s;" record_field_name (make_atd_default_value enum default) type_
-    | _, true -> sprintf "  %s: %s;" record_field_name type_
-    | _, false -> sprintf "  ?%s: %s option;" record_field_name type_
+      sprintf "  ~%s %s <ocaml default=\"%s\">: %s;" record_field_name doc (make_atd_default_value enum default) type_
+    | _, true -> sprintf "  %s %s: %s;" record_field_name doc type_
+    | _, false -> sprintf "  ?%s %s: %s option;" record_field_name doc type_
   in
   match schema.properties with
   | Some properties -> sprintf "{\n%s\n}" (properties |> List.map make_record_field |> String.concat "\n")
@@ -187,7 +226,19 @@ and process_one_of ~ancestors (schemas_or_refs : schema or_ref list) =
   let variants = List.map make_one_of_variant schemas_or_refs |> String.concat "\n" in
   sprintf "[\n%s\n] <json adapter.ocaml=\"Jsonschema2atd_runtime.Adapter.One_of\">" variants
 
-and process_enums enums =
+and process_string_enums enums =
+  let enums =
+    List.map
+      (function
+        | `String s -> s
+        | value ->
+          failwith
+            (sprintf "Invalid value %s in string enum %s" (Yojson.Basic.to_string value)
+               (Yojson.Basic.to_string (`List enums))
+            )
+        )
+      enums
+  in
   let make_enum_variant value = sprintf {|  | %s <json name="%s">|} (variant_name value) value in
   let variants = List.map make_enum_variant enums |> String.concat "\n" in
   sprintf "[\n%s\n]" variants
@@ -195,15 +246,22 @@ and process_enums enums =
 let process_schemas (schemas : (string * schema or_ref) list) =
   List.fold_left
     (fun acc (name, schema_or_ref) ->
-      define_type name (make_type_from_schema_or_ref ~ancestors:[ name ] schema_or_ref) :: acc
+      let doc =
+        match schema_or_ref with
+        | Ref _ -> None
+        | Obj schema -> schema.description
+      in
+      define_type ~doc ~name ~type_:(make_type_from_schema_or_ref ~ancestors:[ name ] schema_or_ref) :: acc
     )
     [] schemas
 
-let base =
-  {|(* Generated by jsonschema2atd *)
+let base from =
+  sprintf
+    {|(* Generated by jsonschema2atd from %s *)
 type json <ocaml module="Yojson.Basic" t="t"> = abstract
 type int64 = int <ocaml repr="int64">
 |}
+    from
 
 let make_atd_of_schemas schemas =
   input_toplevel_schemas :=
@@ -214,21 +272,19 @@ let make_atd_of_schemas schemas =
         )
       schemas;
   Buffer.clear output;
-  Buffer.add_string output (base ^ "\n");
   Buffer.add_string output (String.concat "\n" (process_schemas schemas));
   Buffer.contents output
 
-let make_atd_of_jsonschema input =
+let make_atd_of_jsonschema ?(root = "root") input =
   let schema = Json_schema_j.schema_of_string input in
-  let root_type_name = Option.value ~default:"root" schema.title in
+  let root_type_name = Option.value ~default:root schema.title in
   let defs =
-    match schema.defs with
-    | None -> []
-    | Some defs -> List.map (fun (name, schema) -> name, Obj schema) defs
+    let defs = List.concat_map Utils.list_of_nonempty [ schema.defs; schema.definitions ] in
+    List.map (fun (name, schema) -> name, Obj schema) defs
   in
   make_atd_of_schemas ([ root_type_name, Obj schema ] @ defs)
 
-let make_atd_of_openapi input =
+let make_atd_of_openapi ?root:_ input =
   let root = Openapi_j.root_of_string input in
   match root.components with
   | None -> failwith "components are empty"

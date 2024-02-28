@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "myProperty": {
+      "type": "string",
+      "enum": [
+        "foo",
+        "bar"
+      ]
+    },
+    "myPropertyInt": {
+      "type": "integer",
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "myPropertyNumber": {
+      "type": "number",
+      "enum": [
+        1.2,
+        2.3
+      ]
+    },
+    "myPropertyBool": {
+      "type": "boolean",
+      "enum": [
+        true
+      ]
+    }
+  },
+  "required": [
+    "myProperty"
+  ]
+}

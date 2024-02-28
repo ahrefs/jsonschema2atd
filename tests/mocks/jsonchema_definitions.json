@@ -1,0 +1,23 @@
+{
+  "$id": "https://example.com/schemas/customer",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "$ref": "#/$defs/name"
+    },
+    "last_name": {
+      "$ref": "#/definitions/name"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "shipping_address",
+    "billing_address"
+  ],
+  "definitions": {
+    "name": {
+      "type": "string"
+    }
+  }
+}
