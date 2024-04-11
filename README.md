@@ -4,7 +4,14 @@ Generate an [ATD](https://github.com/ahrefs/atd) file from a JSON Schema / OpenA
 
 ## Installation
 
-Install the package and dependencies with:
+The package is available on [opam](https://ocaml.org/p/jsonschema2atd/latest).
+
+```
+opam install jsonschema2atd
+```
+
+If you wish to install the development version you can do so with:
+
 ```bash
 make install
 ```
