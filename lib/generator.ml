@@ -18,9 +18,9 @@ let define_type ~doc ~name ~type_ =
 
 let process_int_type schema =
   match schema.format with
-  | None | Some `Int32 -> "int"
+  | None | Some `Int32 | Some `UnixTime -> "int"
   | Some `Int64 -> "int64"
-  | _ -> failwith "int has unextected format"
+  | _ -> failwith "int has unexpected format"
 
 let get_ref_name ref =
   let uri, pointer =

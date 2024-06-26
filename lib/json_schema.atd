@@ -17,6 +17,7 @@ type typ = [
 type int_format = [
   | Int32 <json name="int32">
   | Int64 <json name="int64">
+  | UnixTime <json name="unix-time">
 ]
 
 type number_format = [
