@@ -1,5 +1,9 @@
 # History
 
+## 0.0.3
+- Add decimal string format support
+- Add unix-time int format support
+
 ## 0.0.2
 - Support for external references
 - Support for multiple input JSON schemas

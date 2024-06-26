@@ -2,7 +2,7 @@
 (generate_opam_files true)
 
 (name jsonschema2atd)
-(version "0.0.2")
+(version "0.0.3")
 (source (github ahrefs/jsonschema2atd))
 (authors "Ahrefs")
 (maintainers "Egor Chemokhonenko <egor.chemohonenko@ahrefs.com>")
