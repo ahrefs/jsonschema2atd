@@ -18,7 +18,7 @@ let define_type ~doc ~name ~type_ =
 
 let process_int_type schema =
   match schema.format with
-  | None | Some `Int32 | Some `UnixTime -> "int"
+  | None | Some `Int32 | Some `UnixTime | Some `Enum -> "int"
   | Some `Int64 -> "int64"
   | _ -> failwith "int has unexpected format"
 
