@@ -5,6 +5,11 @@ type 'a or_ref = [
   | Ref of ref_
 ] <ocaml repr="classic"> <json adapter.ocaml="Json_schema_adapters.Or_ref">
 
+type 'a or_bool = [
+  | Obj of 'a
+  | Bool of bool
+] <ocaml repr="classic"> <json adapter.ocaml="Json_schema_adapters.Or_bool">
+
 type typ = [
   | Integer <json name="integer">
   | Number <json name="number">
@@ -58,7 +63,7 @@ type schema = {
 
   (* 10.3.2 keywords for applying subschemas to objects *)
   ~properties : (string * schema or_ref) list <json repr="object"> nullable;
-  ~additional_properties <json name="additionalProperties">: schema nullable;
+  ~additional_properties <json name="additionalProperties">: schema or_bool nullable;
 
   (* fields from Json Schema Validation https://json-schema.org/draft/2020-12/json-schema-validation.html *)
 
