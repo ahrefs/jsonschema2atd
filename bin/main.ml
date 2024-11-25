@@ -12,11 +12,11 @@ module Input_format = struct
   let all = [ JSONSchema; OpenAPI ]
 end
 
-let generate_atd input_format paths =
+let generate_atd state input_format paths =
   let generate =
     match input_format with
-    | Input_format.JSONSchema -> Generator.make_atd_of_jsonschema
-    | OpenAPI -> Generator.make_atd_of_openapi
+    | Input_format.JSONSchema -> Generator.make_atd_of_jsonschema ~state
+    | OpenAPI -> Generator.make_atd_of_openapi ~state
   in
   print_endline (Generator.base (String.concat " " (List.map Filename.basename paths)));
   let root =
@@ -44,8 +44,17 @@ let input_format_term =
 
 let main =
   let doc = "Generate an ATD file from a list of JSON Schema / OpenAPI document" in
+  let state_term =
+    Term.(
+      const (fun skip_doc pad ->
+        Generator.{ with_doc = not skip_doc; protect_against_duplicates = (if pad then Some (ref []) else None) }
+      )
+      $ Arg.(value (flag (info [ "skip-doc" ] ~doc:"Skip documentation annotations.")))
+      $ Arg.(value (flag (info [ "protect-against-duplicates" ] ~doc:"Make sure no duplicate types are generated.")))
+    )
+  in
   let paths = Arg.(non_empty & pos_all file [] & info [] ~docv:"FILES" ~doc) in
-  let term = Term.(const generate_atd $ input_format_term $ paths) in
+  let term = Term.(const generate_atd $ state_term $ input_format_term $ paths) in
   let info = Cmd.info "jsonschema2atd" ~doc ~version:(Version.get ()) in
   Cmd.v info term
 
