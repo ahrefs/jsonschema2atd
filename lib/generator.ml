@@ -200,6 +200,7 @@ and process_object_type ~ancestors schema =
     | _, false -> sprintf "  ?%s %s: %s option;" record_field_name doc type_
   in
   match schema.properties with
+  | Some [] -> sprintf "{\n  dummy: unit\n}"
   | Some properties -> sprintf "{\n%s\n}" (properties |> List.map make_record_field |> String.concat "\n")
   | None -> "json"
 
