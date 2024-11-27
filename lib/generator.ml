@@ -6,9 +6,11 @@ type state = {
   with_doc : bool;
   protect_against_duplicates : string list ref option;
   toplevel_types : [ `All | `Only of string list ];
+  avoid_dangling_refs : bool;
 }
 
-let default_state = { with_doc = true; protect_against_duplicates = None; toplevel_types = `All }
+let default_state =
+  { with_doc = true; protect_against_duplicates = None; toplevel_types = `All; avoid_dangling_refs = false }
 
 let record_field_name _state str =
   let cleaned_field_name = Utils.sanitize_name str in
@@ -232,7 +234,14 @@ and make_type_from_schema_or_ref state ~ancestors (schema_or_ref : schema or_ref
   match schema_or_ref, ancestors with
   | Obj schema, ([] | [ _ ]) -> process_schema_type state ~ancestors schema
   | Obj schema, ancestors -> process_nested_schema_type state ~ancestors schema
-  | Ref ref_, _ -> type_name (get_ref_name ref_)
+  | Ref ref_, _ -> begin
+    match
+      (not state.avoid_dangling_refs)
+      || List.exists (fun (name, _schema) -> String.equal (get_ref_name ref_) name) !input_toplevel_schemas
+    with
+    | true -> type_name (get_ref_name ref_)
+    | false -> Printf.sprintf "json (* %s *)" (String.concat "/" (List.rev ancestors))
+  end
 
 and process_one_of state ~ancestors (schemas_or_refs : schema or_ref list) =
   let determine_variant_name = function
