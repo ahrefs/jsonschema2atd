@@ -5,9 +5,10 @@ open Utils
 type state = {
   with_doc : bool;
   protect_against_duplicates : string list ref option;
+  toplevel_types : [ `All | `Only of string list ];
 }
 
-let default_state = { with_doc = true; protect_against_duplicates = None }
+let default_state = { with_doc = true; protect_against_duplicates = None; toplevel_types = `All }
 
 let record_field_name _state str =
   let cleaned_field_name = Utils.sanitize_name str in
@@ -288,6 +289,13 @@ type int64 = int <ocaml repr="int64">
     from
 
 let make_atd_of_schemas state schemas =
+  let schemas =
+    match state.toplevel_types with
+    | `All -> schemas
+    | `Only l ->
+      let res = List.map (Printf.ksprintf Str.regexp "^%s$") l in
+      List.filter (fun (name, _) -> List.exists (fun re -> Str.string_match re name 0) res) schemas
+  in
   input_toplevel_schemas :=
     List.filter_map
       (function

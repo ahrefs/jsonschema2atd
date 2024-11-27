@@ -46,11 +46,24 @@ let main =
   let doc = "Generate an ATD file from a list of JSON Schema / OpenAPI document" in
   let state_term =
     Term.(
-      const (fun skip_doc pad ->
-        Generator.{ with_doc = not skip_doc; protect_against_duplicates = (if pad then Some (ref []) else None) }
+      const (fun skip_doc pad toplevel_types ->
+        Generator.
+          {
+            with_doc = not skip_doc;
+            protect_against_duplicates = (if pad then Some (ref []) else None);
+            toplevel_types;
+          }
       )
       $ Arg.(value (flag (info [ "skip-doc" ] ~doc:"Skip documentation annotations.")))
       $ Arg.(value (flag (info [ "protect-against-duplicates" ] ~doc:"Make sure no duplicate types are generated.")))
+      $ (const (function
+           | [] -> `All
+           | some -> `Only some
+           )
+        $ Arg.(
+            value (opt_all string [] (info [ "only-matching" ] ~docv:"REGEXP" ~doc:"Only output types matching REGEXP."))
+          )
+        )
     )
   in
   let paths = Arg.(non_empty & pos_all file [] & info [] ~docv:"FILES" ~doc) in
