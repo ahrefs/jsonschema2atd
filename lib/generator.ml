@@ -184,7 +184,7 @@ let rec process_schema_type state ~ancestors (schema : schema) =
   | Some Object -> process_object_type state ~ancestors schema
   | None ->
     (* fallback to untyped if schema type is not defined *)
-    maybe_nullable "json"
+    Printf.ksprintf maybe_nullable "json (* %s *)" (String.concat "/" (List.rev ancestors))
 
 and process_array_type state ~ancestors schema =
   match schema.items with
