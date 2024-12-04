@@ -18,7 +18,7 @@ let generate_atd state input_format paths =
     | Input_format.JSONSchema -> Generator.make_atd_of_jsonschema ~state
     | OpenAPI -> Generator.make_atd_of_openapi ~state
   in
-  print_endline (Generator.base (String.concat " " (List.map Filename.basename paths)));
+  print_endline (Generator.base state (String.concat " " (List.map Filename.basename paths)));
   let root =
     match paths with
     | [ _ ] -> `Default
@@ -46,13 +46,14 @@ let main =
   let doc = "Generate an ATD file from a list of JSON Schema / OpenAPI document" in
   let state_term =
     Term.(
-      const (fun skip_doc pad toplevel_types avoid_dangling_refs ->
+      const (fun skip_doc pad toplevel_types avoid_dangling_refs json_ocaml_type ->
         Generator.
           {
             with_doc = not skip_doc;
             protect_against_duplicates = (if pad then Some (ref []) else None);
             toplevel_types;
             avoid_dangling_refs;
+            json_ocaml_type;
           }
       )
       $ Arg.(value (flag (info [ "skip-doc" ] ~doc:"Skip documentation annotations.")))
@@ -66,6 +67,12 @@ let main =
           )
         )
       $ Arg.(value (flag (info [ "avoid-dangling-refs" ] ~doc:"Convert dangling refs to json.")))
+      $ Arg.(
+          value
+            (opt (pair ~sep:':' string string) Generator.default_state.json_ocaml_type
+               (info [ "json-ocaml-type" ] ~docv:"MODULE.PATH:TYPE-NAME" ~doc:"Use an alternate Mod.type for `json`.")
+            )
+        )
     )
   in
   let paths = Arg.(non_empty & pos_all file [] & info [] ~docv:"FILES" ~doc) in
