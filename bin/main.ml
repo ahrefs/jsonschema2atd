@@ -68,9 +68,12 @@ let main =
         )
       $ Arg.(value (flag (info [ "avoid-dangling-refs" ] ~doc:"Convert dangling refs to json.")))
       $ Arg.(
+          let keyword = enum [ "module", `Module; "from", `From ] in
           value
-            (opt (pair ~sep:':' string string) Generator.default_state.json_ocaml_type
-               (info [ "json-ocaml-type" ] ~docv:"MODULE.PATH:TYPE-NAME" ~doc:"Use an alternate Mod.type for `json`.")
+            (opt (t3 ~sep:':' keyword string string) Generator.default_state.json_ocaml_type
+               (info [ "json-ocaml-type" ] ~docv:"KEYWORD:MODULE.PATH:TYPE-NAME"
+                  ~doc:"Use an alternate Mod.type for `json`, e.g. from:My_mod.Submod:json_type."
+               )
             )
         )
     )
