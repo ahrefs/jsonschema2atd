@@ -105,7 +105,7 @@ let make_atd_default_value enum json_value =
     failwith (sprintf "only string enum default values are supported, can't process: %s" (Yojson.Basic.to_string json))
   | None, json -> ocaml_value_of_json json
 
-let nullable = Printf.sprintf "%s nullable"
+let nullable = sprintf "%s nullable"
 
 let merge_all_of schema =
   match schema.all_of with
@@ -193,7 +193,7 @@ let rec process_schema_type state ~ancestors (schema : schema) =
   | Some Object -> process_object_type state ~ancestors schema
   | None ->
     (* fallback to untyped if schema type is not defined *)
-    Printf.ksprintf maybe_nullable "json (* %s *)" (String.concat "/" (List.rev ancestors))
+    ksprintf maybe_nullable "json (* %s *)" (String.concat "/" (List.rev ancestors))
 
 and process_array_type state ~ancestors schema =
   match schema.items with
@@ -315,7 +315,7 @@ let make_atd_of_schemas state schemas =
     match state.toplevel_types with
     | `All -> schemas
     | `Only l ->
-      let res = List.map (Printf.ksprintf Str.regexp "^%s$") l in
+      let res = List.map (ksprintf Str.regexp "^%s$") l in
       List.filter (fun (name, _) -> List.exists (fun re -> Str.string_match re name 0) res) schemas
   in
   input_toplevel_schemas :=
