@@ -62,6 +62,15 @@ You can call `jsonschema2atd` and `atdgen` in your `dune` file to generate OCaml
    (run %{bin:atdgen} -t %{deps}))))
 ```
 
+Other options can be used to control the output:
+
+- `--json-ocaml-type KEYWORD:MODULE.PATH:TYPE-NAME` to control the defitiion of
+  the `json` type used as default/fallback.
+- `--only-matching REGEXP` to limit the JSONSchema types to convert, when used
+  together with `--avoid-dangling-refs`, missing types are replaced with `json`.
+
+See also `jsonschema2atd --help`.
+
 ## ToDo
 
 - [X] Base types
