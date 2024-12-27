@@ -165,8 +165,8 @@ let merge_all_of schema =
       nullable = schemas |> List.exists (fun schema -> schema.nullable);
     }
 
-let rec process_schema_type state ~ancestors (schema : schema) =
-  let schema = merge_all_of schema in
+let rec process_schema_type state ~ancestors (input_schema : schema) =
+  let schema = merge_all_of input_schema in
   let maybe_nullable type_ = if schema.nullable then nullable type_ else type_ in
   match schema.one_of with
   | Some schemas -> process_one_of state ~ancestors schemas
@@ -193,7 +193,16 @@ let rec process_schema_type state ~ancestors (schema : schema) =
   | Some Object -> process_object_type state ~ancestors schema
   | None ->
     (* fallback to untyped if schema type is not defined *)
-    ksprintf maybe_nullable "json (* %s *)" (String.concat "/" (List.rev ancestors))
+    ksprintf maybe_nullable "json (* %s *)"
+      (String.concat ","
+         (List.map
+            (function
+              | Ref s -> s
+              | _ -> "_"
+              )
+            (Option.value ~default:[ Ref (String.concat "/" (List.rev ancestors)) ] input_schema.all_of)
+         )
+      )
 
 and process_array_type state ~ancestors schema =
   match schema.items with
@@ -247,7 +256,7 @@ and make_type_from_schema_or_ref state ~ancestors (schema_or_ref : schema or_ref
       || List.exists (fun (name, _schema) -> String.equal (get_ref_name ref_) name) !input_toplevel_schemas
     with
     | true -> type_name (get_ref_name ref_)
-    | false -> sprintf "json (* %s *)" (String.concat "/" (List.rev ancestors))
+    | false -> sprintf "json (* %s *)" ref_
   end
 
 and process_one_of state ~ancestors (schemas_or_refs : schema or_ref list) =
