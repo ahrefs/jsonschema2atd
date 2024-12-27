@@ -247,7 +247,7 @@ and make_type_from_schema_or_ref state ~ancestors (schema_or_ref : schema or_ref
       || List.exists (fun (name, _schema) -> String.equal (get_ref_name ref_) name) !input_toplevel_schemas
     with
     | true -> type_name (get_ref_name ref_)
-    | false -> Printf.sprintf "json (* %s *)" (String.concat "/" (List.rev ancestors))
+    | false -> sprintf "json (* %s *)" (String.concat "/" (List.rev ancestors))
   end
 
 and process_one_of state ~ancestors (schemas_or_refs : schema or_ref list) =
