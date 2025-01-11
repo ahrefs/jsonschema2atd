@@ -67,7 +67,13 @@ let rec ocaml_value_of_json ~typ = function
      | _ -> (Yojson.Basic.to_string json)
 
     )
-  | `String value -> sprintf "\\\"%s\\\"" value
+  | `String value ->
+    (match typ with
+     | Some Boolean -> value
+     | Some Integer -> value
+     | _ ->
+       sprintf "\\\"%s\\\"" value
+    )
   | `List elements ->
     let list_elements = List.map (ocaml_value_of_json ~typ:None) elements |> String.concat ";" in
     sprintf "[%s]" list_elements
