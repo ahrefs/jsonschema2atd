@@ -35,10 +35,16 @@ type str_format = [
   | Decimal <json name="decimal">
 ]
 
+type object_format = [
+  | KvPair <json name="kvpairs">
+  | Map <json name="map">
+]
+
 type format = [
   | inherit int_format
   | inherit number_format
   | inherit str_format
+  | inherit object_format
 ]
 
 type schema = {
