@@ -35,6 +35,7 @@ type str_format = [
   | Decimal <json name="decimal">
   | Uri <json name="uri">
   | Binary <json name="binary">
+  | Uuid <json name="uuid">
 ]
 
 type object_format = [
