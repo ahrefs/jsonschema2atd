@@ -71,7 +71,10 @@ let type_name = sanitize_name
 let variant_name str =
   match str with
   | "" -> "None"
-  | _ ->  String.capitalize_ascii (sanitize_name str)
+  | _ ->
+    match str.[0] with
+    | '0'..'9' -> "N_" ^ (sanitize_name str)
+    | _ -> String.capitalize_ascii (sanitize_name str)
 
 module Fresh (T : sig
     type t
