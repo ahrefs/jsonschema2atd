@@ -33,6 +33,7 @@ type str_format = [
   | Email <json name="email">
   | Idn_email <json name="idn-email">
   | Decimal <json name="decimal">
+  | Uri <json name="uri">
 ]
 
 type object_format = [
