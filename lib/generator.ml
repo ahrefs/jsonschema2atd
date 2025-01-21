@@ -153,7 +153,7 @@ let rec process_schema_type ~ancestors (schema : schema) =
   | Some schemas -> process_one_of ~ancestors schemas
   | None ->
     match schema.enum, schema.typ with
-    | Some enums, Some String -> process_string_enums enums
+    | Some enums, (Some String | None) -> process_string_enums enums
     | Some _, Some Integer ->
       (* this is more lenient than it should *)
       maybe_nullable (process_int_type schema)
@@ -164,7 +164,6 @@ let rec process_schema_type ~ancestors (schema : schema) =
       (* this is more lenient than it should *)
       maybe_nullable "bool"
     | Some _, Some typ -> failwith (Printf.sprintf "only string enums are supported : on field %s got typ %s" (Option.value ~default:"" schema.title) (Json_schema_j.string_of_typ typ))
-    | Some _, None -> failwith (Printf.sprintf "only string enums are supported : on field %s got no type" (Option.value ~default:"" schema.title))
     | None, _ ->
       match schema.typ with
       | Some Integer -> maybe_nullable (process_int_type schema)
@@ -241,9 +240,10 @@ and process_one_of ~ancestors (schemas_or_refs : schema or_ref list) =
 
 and process_string_enums enums =
   let enums =
-    List.map
+    List.filter_map
       (function
-        | `String s -> s
+        | `String s -> Some s
+        | `Null -> None
         | value ->
           failwith
             (sprintf "Invalid value %s in string enum %s" (Yojson.Basic.to_string value)
