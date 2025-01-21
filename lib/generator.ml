@@ -163,7 +163,8 @@ let rec process_schema_type ~ancestors (schema : schema) =
     | Some _, Some Boolean ->
       (* this is more lenient than it should *)
       maybe_nullable "bool"
-    | Some _, _ -> failwith "only string enums are supported"
+    | Some _, Some typ -> failwith (Printf.sprintf "only string enums are supported : on field %s got typ %s" (Option.value ~default:"" schema.title) (Json_schema_j.string_of_typ typ))
+    | Some _, None -> failwith (Printf.sprintf "only string enums are supported : on field %s got no type" (Option.value ~default:"" schema.title))
     | None, _ ->
       match schema.typ with
       | Some Integer -> maybe_nullable (process_int_type schema)
