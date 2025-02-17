@@ -1,5 +1,10 @@
 # History
 
+## WIP
+
+- Add options `--json-ocaml-type`, `--only-matching`,
+  `--avoid-dangling-refs`, and `--skip-doc`.
+
 ## 0.0.3
 - Add decimal string format support
 - Add unix-time int format support
