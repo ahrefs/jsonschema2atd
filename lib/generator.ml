@@ -278,7 +278,7 @@ and process_one_of state ~ancestors (schemas_or_refs : schema or_ref list) =
       match (merge_all_of schema).typ with
       | Some Array -> concat_camelCase (process_array_type state ~ancestors schema)
       | Some Object -> "Json"
-      | _ -> variant_name (process_schema_type ~ancestors schema)
+      | _ -> variant_name (process_schema_type state ~ancestors schema)
   in
   let make_one_of_variant schema_or_ref =
     let variant_name = determine_variant_name schema_or_ref in
@@ -314,7 +314,7 @@ let process_schemas state (schemas : (string * schema or_ref) list) =
          | Ref _ -> None
          | Obj schema -> schema.description
        in
-       define_type state ~doc ~name ~type_:(make_type_from_schema_or_ref ~ancestors:[ name ] schema_or_ref) :: acc
+       define_type state ~doc ~name ~type_:(make_type_from_schema_or_ref state ~ancestors:[ name ] schema_or_ref) :: acc
     )
     [] schemas
 
