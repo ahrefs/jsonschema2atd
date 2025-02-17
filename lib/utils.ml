@@ -68,20 +68,21 @@ let sanitize_name str =
 let concat_camelCase strs = strs |> List.map String.capitalize_ascii |> String.concat ""
 let concat_snake_case strs = String.concat "_" strs
 let type_name = sanitize_name
+
 let variant_name str =
   match str with
   | "" -> "None"
   | _ ->
-    match str.[0] with
-    | '0'..'9' -> "N_" ^ (sanitize_name str)
-    | _ -> String.capitalize_ascii (sanitize_name str)
+  match str.[0] with
+  | '0' .. '9' -> "N_" ^ sanitize_name str
+  | _ -> String.capitalize_ascii (sanitize_name str)
 
 module Fresh (T : sig
-    type t
+  type t
 
-    val compare : t -> t -> int
-  end)
-    () =
+  val compare : t -> t -> int
+end)
+() =
 struct
   external id : 'a -> 'a = "%identity"
 
