@@ -33,12 +33,21 @@ type str_format = [
   | Email <json name="email">
   | Idn_email <json name="idn-email">
   | Decimal <json name="decimal">
+  | Uri <json name="uri">
+  | Binary <json name="binary">
+  | Uuid <json name="uuid">
+]
+
+type object_format = [
+  | KvPair <json name="kvpairs">
+  | Map <json name="map">
 ]
 
 type format = [
   | inherit int_format
   | inherit number_format
   | inherit str_format
+  | inherit object_format
 ]
 
 type schema = {
