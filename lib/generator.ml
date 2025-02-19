@@ -340,7 +340,7 @@ let make_atd_of_schemas state schemas =
     match state.toplevel_types with
     | `All -> schemas
     | `Only l ->
-      let res = List.map (ksprintf Str.regexp "^%s$") l in
+      let res = List.map (ksprintf Str.regexp "%s") l in
       List.filter (fun (name, _) -> List.exists (fun re -> Str.string_match re name 0) res) schemas
   in
   input_toplevel_schemas :=
